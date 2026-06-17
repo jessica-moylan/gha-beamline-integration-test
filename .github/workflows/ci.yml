@@ -25,7 +25,7 @@ jobs:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 }
-          - { endstation: hxn, redis-host: xf17id1-hxn-redis1.nsls2.bnl.gov, repo: hxn-profile-collection, branch: main }
+          - { endstation: hxn, redis-host: xf17id1-hxn-redis1.nsls2.bnl.gov, repo: jessica-moylan/hxn-profile-collection, branch: fixing_bl-specifc.sh }
           - { endstation: ixs, redis-host: xf23id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }
     runs-on: ubuntu-latest
     steps:
