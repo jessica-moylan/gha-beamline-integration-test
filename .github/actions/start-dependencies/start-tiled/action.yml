@@ -172,13 +172,14 @@ runs:
         python3 -c "
         import os
         from tiled.client import from_profile
+        print(BEAMLINE_ACRONYM)
         tla = os.getenv('BEAMLINE_ACRONYM', 'xyz').lower()
         TLA = tla.upper()
         client = from_profile('nsls2', api_key=os.getenv(f'TILED_BLUESKY_WRITING_API_KEY_{TLA}', 'secret'))
-        if TLA == "HXN":
-          client.create_container(tla).create_container('migration', specs=['CatalogOfBlueskyRuns'])
-          print(client[tla]['migration'])
+        if tla == "hxn":
+            client.create_container(tla).create_container('migration', specs=['CatalogOfBlueskyRuns'])
+            print(client[tla]['migration'])
         else:
-          client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])
-        print(client[tla]['raw'])"
+            client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])
+            print(client[tla]['raw'])
       shell: bash
