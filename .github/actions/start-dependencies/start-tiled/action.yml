@@ -180,5 +180,5 @@ runs:
         if tla == 'hxn':
           client.create_container(tla).create_container('migration', specs=['CatalogOfBlueskyRuns'])
         else:
-          client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])
+          client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])"
       shell: bash
