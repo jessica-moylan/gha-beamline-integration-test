@@ -169,14 +169,16 @@ runs:
             Authorization: "Apikey ${TILED_SERVER_API_KEY}"
         EOF
 
+        echo "Tiled server is ready and profile created. Output of client[tla]['raw']:"
+
         python3 -c "
         import os
         from tiled.client import from_profile
         tla = os.getenv('BEAMLINE_ACRONYM', 'xyz').lower()
         TLA = tla.upper()
         client = from_profile('nsls2', api_key=os.getenv(f'TILED_BLUESKY_WRITING_API_KEY_{TLA}', 'secret'))
-        client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])
         if tla == 'hxn':
           client.create_container(tla).create_container('migration', specs=['CatalogOfBlueskyRuns'])
-        print(client[tla]['raw'])"
+        else:
+          client.create_container(tla).create_container('raw', specs=['CatalogOfBlueskyRuns'])
       shell: bash
