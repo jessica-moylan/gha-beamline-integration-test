@@ -24,7 +24,7 @@ jobs:
           - isr
           - ixs
         include:
-          - { endstation: cdi, redis-host: xf17id1-cdi-redis1.nsls2.bnl.gov, repo: cdi-profile-collection, branch: main }
+          - { endstation: cdi, redis-host: xf17id1-cdi-redis1.nsls2.bnl.gov, repo: jessica-moylan/cdi-profile-collection, branch: beamline-testing }
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 }
