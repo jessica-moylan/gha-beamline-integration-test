@@ -154,19 +154,3 @@ runs:
 
         sudo service stunnel4 restart
         sleep 1     
-
-    - name: Start Tiled
-      uses: ./.github/actions/start-dependencies/start-tiled
-
-
-    - name: Apply auto settings
-      shell: bash -leo pipefail {0}
-      run: |
-        if [ -f "${CLONED_REPO}/.ci/auto_settings.sav" ]; then
-          while IFS= read -r line; do
-            if [ -n "$line" ]; then
-                caproto-put $line
-            fi
-          done < "${CLONED_REPO}/.ci/auto_settings.sav"
-        fi
-

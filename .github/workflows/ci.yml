@@ -9,31 +9,6 @@ on:
       - '**'
   workflow_dispatch:
 jobs:
-  start-dependencies:
-    name: Start dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout test harness
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-
-      # Set up pixi
-      - name: Set up pixi
-        uses: prefix-dev/setup-pixi@19eac09b398e3d0c747adc7921926a6d802df4da # v0.8.8
-        with:
-          pixi-version: v0.56.0
-          run-install: false
-          cache: false
-
-      - name: Start dependencies
-        uses: ./.github/actions/start-dependencies
-
   testing_beamline_profiles:
     name: ${{ matrix.endstation }} (${{ matrix.pixi-env }})
     strategy:
@@ -59,13 +34,44 @@ jobs:
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: jessica-moylan/nyx-profile-collection, branch: beamline-testing }
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
     runs-on: ubuntu-latest
-    needs: start-dependencies
     steps:
+      - name: Checkout test harness
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      # Set up pixi
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@19eac09b398e3d0c747adc7921926a6d802df4da # v0.8.8
+        with:
+          pixi-version: v0.56.0
+          run-install: false
+          cache: false
+
+      - name: Start dependencies
+        uses: ./.github/actions/start-dependencies
+
+      - name: Start Tiled
+        uses: ./.github/actions/start-dependencies/start-tiled
+
+      - name: Apply auto settings
+        shell: bash -leo pipefail {0}
+        run: |
+          if [ -f "${CLONED_REPO}/.ci/auto_settings.sav" ]; then
+            while IFS= read -r line; do
+              if [ -n "$line" ]; then
+                  caproto-put $line
+              fi
+            done < "${CLONED_REPO}/.ci/auto_settings.sav"
+          fi
+
       - name: Fetch beamline profiles
         uses: ./.github/actions/fetch-beamline-profiles
-      
-      - name: Start Tiled server
-        uses: ./.github/actions/start-tiled
 
       - name: Beamline-specific, gets env vars and repo info
         uses: ./.github/actions/prepare-environment
