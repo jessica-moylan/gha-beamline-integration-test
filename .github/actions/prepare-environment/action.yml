@@ -68,12 +68,6 @@ runs:
           echo "Skipping profile_collection symlink setup; missing ${INI_FILE}"
         fi
 
-        # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
-        if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
-          sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
-          cp -fv ~/.ipython/profile_test/*.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
-        fi
-
         # TODO: fix SRX and HXN hardcoded paths.
         export LOGS_HOME="$HOME"
         if [ "${BEAMLINE_ACRONYM}" == "srx" ]; then
@@ -92,7 +86,16 @@ runs:
 
         mkdir -v -p $HOME/.ipython/
         # Copy the entire "startup" directory to the test profile.
+
+        echo "Copying ${CLONED_REPO} to $HOME/.ipython/profile_test"
         cp -rv "${CLONED_REPO}" $HOME/.ipython/profile_test
+
+        # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
+        if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
+          sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
+          cp -fv ~/.ipython/profile_test/*.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
+        fi
+
         # Remove the top-level .py files as they will be loaded separately from
         # profile_collection/startup dir. That allows proper capturing of the
         # exit code in case IPython startup files have issues.
