@@ -99,6 +99,7 @@ jobs:
             import os, glob, sys, traceback
             ip = get_ipython()
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
+            print(f'Found startup files: {os.getcwd()}/startup/*.py -> {startup_files}')
             if os.path.isfile('.ci/drop-in.py'):
               startup_files.append('.ci/drop-in.py')
 
