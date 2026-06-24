@@ -102,10 +102,6 @@ jobs:
             print(f'Found startup files: {os.getcwd()}/startup/*.py -> {startup_files}')
             if os.path.isfile('.ci/drop-in.py'):
               startup_files.append('.ci/drop-in.py')
-
-            # Some profiles have configuration csv files that are needed
-            if os.path.isfile('*.csv'):
-              startup_files.append('*.csv')
             if not startup_files:
               raise SystemExit(f'Cannot find any startup files in {os.getcwd()}')
             for f in startup_files:
