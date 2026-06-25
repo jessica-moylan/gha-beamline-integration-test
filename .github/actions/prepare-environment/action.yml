@@ -95,7 +95,7 @@ runs:
         # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
         if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
           sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
-          cp -fv "${CLONED_REPO}" /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/        
+          cp -fv /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/OPLS_attenuator_thickness.csv        
         fi
 
         # Remove the top-level .py files as they will be loaded separately from
