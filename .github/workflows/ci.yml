@@ -35,7 +35,7 @@ jobs:
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
           - { endstation: smi, redis-host: xf12id2-smi-redis1.nsls2.bnl.gov, repo: smi-profile-collection, branch: main }
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: jessica-moylan/nyx-profile-collection, branch: beamline-testing }
-          - { endstation: pdf, redis-host: xf28id1-pdf-redis1.nsls2.bnl.gov, repo: pdf-profile-collection, branch: main } 
+          - { endstation: pdf, redis-host: xf28id1-pdf-redis1.nsls2.bnl.gov, repo: jessica-moylan/pdf-profile-collection, branch: LICENSE } 
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
     runs-on: ubuntu-latest
     steps:
