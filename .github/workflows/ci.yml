@@ -100,7 +100,6 @@ jobs:
             # Get system arguments, needed currently for SIX with user inputs
             # TODO: do both SIX endatations, six and keithley, need to be tested?
             beamline_acronym = os.environ.get('BEAMLINE_ACRONYM', 'unknown')
-            print(f'BEAMLINE_ACRONYM={beamline_acronym}')
             six_endstation1 = 'six'
 
             ip = get_ipython()
@@ -109,19 +108,19 @@ jobs:
               startup_files.append('.ci/drop-in.py')
             if not startup_files:
               raise SystemExit(f'Cannot find any startup files in {os.getcwd()}')
-              
+
             for f in startup_files:
                 if not os.path.isfile(f):
-                  raise FileNotFoundError(f'File {f} cannot be found. IN IF STATEMENT ISSUE')
+                  raise FileNotFoundError(f'File {f} cannot be found.')
                 print(f'Executing {f} in CI')
                 try:
-                  if f.endswith('00-startup.py') and beamline_acronym == 'SIX':
+                  if f.endswith('00-startup.py') and beamline_acronym == 'six':
                     sys.argv = ['00-startup.py', 'arg1']
 
                     simulated_inputs = 'SIX\n'
                     sys.stdin = io.StringIO(simulated_inputs)
 
-                    ip.parent._exec_file('00-startup.py')
+                    ip.parent._exec_file(f)
 
                     sys.stdin = sys.__stdin__
                     sys.argv = [sys.argv[0]]
