@@ -99,8 +99,8 @@ runs:
 
         # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
         if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
-          sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
-          if [ -f /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/ ]; then
+          mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
+          if [ -d /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/ ]; then
             echo "Directory exists"
           else
             echo "Directory does not exist"
