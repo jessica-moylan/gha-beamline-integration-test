@@ -90,9 +90,10 @@ runs:
         echo "Copying ${CLONED_REPO} to $HOME/.ipython/profile_test"
         cp -rv "${CLONED_REPO}" $HOME/.ipython/profile_test
 
+        echo "${BEAMLINE_ACRONYM}"
+
         # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
         if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
-          echo "${BEAMLINE_ACRONYM}"
           sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
           cp -fv "${CLONED_REPO}" /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/        
         fi
