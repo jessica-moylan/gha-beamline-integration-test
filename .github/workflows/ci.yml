@@ -100,7 +100,7 @@ jobs:
             # Get system arguments, needed currently for SIX with user inputs
             # TODO: do both SIX endatations, six and keithley, need to be tested?
             beamline_acronym = os.environ.get('BEAMLINE_ACRONYM', 'unknown')
-            six_endstation1 = "six"
+            six_endstation1 = 'six'
             #six_endstation2 = "keithley"
 
             ip = get_ipython()
@@ -114,7 +114,7 @@ jobs:
                   raise FileNotFoundError(f'File {f} cannot be found.')
                 print(f'Executing {f} in CI')
                 try:
-                  if f.startswith('00-') and beamline_acronym == "six":
+                  if f.startswith('00-') and beamline_acronym == 'six':
                     sys.argv = ['00-startup.py', six_endstation1]
                   ip.parent._exec_file(f)
                 except Exception as e:
