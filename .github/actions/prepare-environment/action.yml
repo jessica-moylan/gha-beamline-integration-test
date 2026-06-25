@@ -96,6 +96,12 @@ runs:
           cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuator_thickness.csv 
         fi
 
+        if [ -f "/nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuators_database.csv" ]; then
+          echo "OPLS attenuator database file exists."
+        else
+          echo "OPLS attenuator database file does not exist."
+        fi
+
         # Remove the top-level .py files as they will be loaded separately from
         # profile_collection/startup dir. That allows proper capturing of the
         # exit code in case IPython startup files have issues.
