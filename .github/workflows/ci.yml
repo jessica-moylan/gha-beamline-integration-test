@@ -95,13 +95,12 @@ jobs:
             export MKL_NUM_THREADS=1
             
             command="
-            import os, glob, sys, traceback
+            import io, os, glob, sys, traceback
 
             # Get system arguments, needed currently for SIX with user inputs
             # TODO: do both SIX endatations, six and keithley, need to be tested?
             beamline_acronym = os.environ.get('BEAMLINE_ACRONYM', 'unknown')
             six_endstation1 = 'six'
-            #six_endstation2 = "keithley"
 
             ip = get_ipython()
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
@@ -115,8 +114,18 @@ jobs:
                 print(f'Executing {f} in CI')
                 try:
                   if f.startswith('00-') and beamline_acronym == 'six':
-                    sys.argv = ['00-startup.py', six_endstation1]
-                  ip.parent._exec_file(f)
+                    sys.argv = ['00-startup.py', 'arg1']
+
+                    simulated_inputs = 'six'
+                    sys.stdin = io.StringIO(simulated_inputs)
+
+                    ip.parent._exec_file('00-startup.py')
+
+                    sys.stdin = sys.__stdin__
+                    sys.argv = [sys.argv[0]]
+
+                  else:
+                    ip.parent._exec_file(f)
                 except Exception as e:
                   print(f'ERROR in {f}:')
                   traceback.print_exc()
