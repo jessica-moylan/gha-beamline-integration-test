@@ -94,13 +94,14 @@ runs:
         if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
           mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
           cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuator_thickness.csv 
+          cat << 'EOF' > /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuators_database.csv
+            2025-01-27 14:50:22.581335,"{""Nb_9.7keV"": {""att0"": 1, ""att1"": 10.0, ""att2"": 11.0, ""att3"": 10.0, ""att4"": 10.0, ""att5"": 11.0, ""att6"": 10.0, ""att7"": 11.0}, 
+                                        ""Si_14.4keV"": {""att0"": 1, ""att1"": 14.0, ""att2"": 14.0, ""att3"": 14.0, ""att4"": 14.0, ""att5"": 14.0, ""att6"": 15.0}, 
+                                        ""Cu_16.1keV"": {""att0"": 1, ""att1"": 7.0, ""att2"": 7.0, ""att3"": 7.0, ""att4"": 6.0, ""att5"": 6.0, ""att6"": 7.0}, 
+                                        ""Al_23keV"": {""att0"": 1, ""att1"": 11.0, ""att2"": 11.0, ""att3"": 10.0, ""att4"": 12.0, ""att5"": 10.0}}"
+          EOF
         fi
 
-        if [ -f "/nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuators_database.csv" ]; then
-          echo "OPLS attenuator database file exists."
-        else
-          echo "OPLS attenuator database file does not exist."
-        fi
 
         # Remove the top-level .py files as they will be loaded separately from
         # profile_collection/startup dir. That allows proper capturing of the
