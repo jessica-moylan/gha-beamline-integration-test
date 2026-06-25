@@ -113,10 +113,10 @@ jobs:
                   raise FileNotFoundError(f'File {f} cannot be found.')
                 print(f'Executing {f} in CI')
                 try:
-                  if f.startswith('00-') and beamline_acronym == 'six':
+                  if f.endswith('00-startup.py') and beamline_acronym == 'six':
                     sys.argv = ['00-startup.py', 'arg1']
 
-                    simulated_inputs = 'SIX'
+                    simulated_inputs = 'SIX\n'
                     sys.stdin = io.StringIO(simulated_inputs)
 
                     ip.parent._exec_file('00-startup.py')
