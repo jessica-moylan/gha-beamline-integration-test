@@ -105,7 +105,7 @@ runs:
           else
             echo "Directory does not exist"
           fi
-          cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /tmp/OPLS_attenuator_thickness.csv 
+          cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/OPLS_attenuator_thickness.csv 
         fi
 
         # Remove the top-level .py files as they will be loaded separately from
