@@ -91,11 +91,21 @@ runs:
         cp -rv "${CLONED_REPO}" $HOME/.ipython/profile_test
 
         echo "${BEAMLINE_ACRONYM}"
+        if [ -f /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv ]; then
+          echo "OPLS_attenuator_thickness.csv exists"
+        else
+          echo "OPLS_attenuator_thickness.csv does not exist"
+        fi 
 
         # For OPLS beamline, they have a specific .csv configuration file that needs to be acceessed in a certain directory
         if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
           sudo mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
-          cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/OPLS_attenuator_thickness.csv        
+          if [ -f /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/ ]; then
+            echo "Directory exists"
+          else
+            echo "Directory does not exist"
+          fi
+          cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /tmp/OPLS_attenuator_thickness.csv 
         fi
 
         # Remove the top-level .py files as they will be loaded separately from
