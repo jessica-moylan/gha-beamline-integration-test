@@ -116,7 +116,7 @@ jobs:
                   if f.startswith('00-') and beamline_acronym == 'six':
                     sys.argv = ['00-startup.py', 'arg1']
 
-                    simulated_inputs = 'six'
+                    simulated_inputs = 'SIX'
                     sys.stdin = io.StringIO(simulated_inputs)
 
                     ip.parent._exec_file('00-startup.py')
