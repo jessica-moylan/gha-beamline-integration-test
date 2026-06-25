@@ -72,7 +72,6 @@ jobs:
       - name: Start dependencies
         uses: ./.github/actions/start-dependencies
 
-    # Run profile tests      
       - name: Run profile startup tests
         shell: bash -leo pipefail {0}
         run: |
@@ -97,6 +96,13 @@ jobs:
             
             command="
             import os, glob, sys, traceback
+
+            # Get system arguments, needed currently for SIX with user inputs
+            # TODO: do both SIX endatations, six and keithley, need to be tested?
+            beamline_acronym = os.environ.get('BEAMLINE_ACRONYM', 'unknown')
+            six_endstation1 = "six"
+            #six_endstation2 = "keithley"
+
             ip = get_ipython()
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
             if os.path.isfile('.ci/drop-in.py'):
@@ -104,15 +110,19 @@ jobs:
             if not startup_files:
               raise SystemExit(f'Cannot find any startup files in {os.getcwd()}')
             for f in startup_files:
-              if not os.path.isfile(f):
-                raise FileNotFoundError(f'File {f} cannot be found.')
-              print(f'Executing {f} in CI')
-              try:
-                ip.parent._exec_file(f)
-              except Exception as e:
-                print(f'ERROR in {f}:')
-                traceback.print_exc()
-                raise"
+                if not os.path.isfile(f):
+                  raise FileNotFoundError(f'File {f} cannot be found.')
+                print(f'Executing {f} in CI')
+                try:
+                  if f.startswith('00-') and beamline_acronym == "six":
+                    sys.argv = ['00-startup.py', six_endstation1]
+                  ip.parent._exec_file(f)
+                except Exception as e:
+                  print(f'ERROR in {f}:')
+                  traceback.print_exc()
+                  raise
+            "
+
             env | grep EPICS || true
 
             set +e
