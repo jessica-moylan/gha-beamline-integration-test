@@ -181,8 +181,6 @@ runs:
             return parent[key]
           except Exception:
             try:
-              if specs is None:
-                return parent.create_container(key)
               return parent.create_container(key, specs=specs)
             except Exception:
               return parent[key]
