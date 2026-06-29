@@ -199,5 +199,6 @@ runs:
             get_or_create_container(beamline, "raw", specs=["CatalogOfBlueskyRuns"], metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
         else:
             get_or_create_container(beamline, "raw", specs=["CatalogOfBlueskyRuns"])
+        "
 
       shell: bash
