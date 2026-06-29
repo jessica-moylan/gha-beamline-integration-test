@@ -172,33 +172,28 @@ runs:
         python3 -c "
         import os
         from tiled.client import from_profile
-
-        tla = os.getenv("BEAMLINE_ACRONYM", "xyz").lower()
+        tla = os.getenv('BEAMLINE_ACRONYM', 'xyz').lower()
         TLA = tla.upper()
-        client = from_profile("nsls2", api_key=os.getenv(f"TILED_BLUESKY_WRITING_API_KEY_{TLA}", "secret"))
+        client = from_profile('nsls2', api_key=os.getenv(f'TILED_BLUESKY_WRITING_API_KEY_{TLA}', 'secret'))
 
-        def get_or_create_container(parent, key, specs=None, metadata=None):
+        def get_or_create_container(parent, key, specs=None, metadata = {}):
+          try:
+            return parent[key]
+          except Exception:
             try:
-                node = parent[key]
-                # Optional: if it exists, you could update metadata here (version-dependent API).
-                return node
+              if specs is None:
+                return parent.create_container(key, metadata=metadata)
+              return parent.create_container(key, specs=specs, metadata=metadata)
             except Exception:
-                try:
-                    if specs is None:
-                        return parent.create_container(key, metadata=metadata or {})
-                    return parent.create_container(key, specs=specs, metadata=metadata or {})
-                except Exception:
-                    return parent[key]
+              return parent[key]
 
         beamline = get_or_create_container(client, tla)
-
         if tla == 'smi':
-            get_or_create_container(beamline, "migration", specs=["CatalogOfBlueskyRuns"])
-            get_or_create_container(beamline, "raw", specs=["CatalogOfBlueskyRuns"])
+          get_or_create_container(beamline, 'migration', specs=['CatalogOfBlueskyRuns'])
+          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
         elif tla == 'opls':
-            get_or_create_container(beamline, "raw", specs=["CatalogOfBlueskyRuns"], metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
+          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'], metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
         else:
-            get_or_create_container(beamline, "raw", specs=["CatalogOfBlueskyRuns"])
-        "
-
+          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])"
+          
       shell: bash
