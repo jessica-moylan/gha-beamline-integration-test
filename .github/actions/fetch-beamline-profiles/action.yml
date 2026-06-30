@@ -22,7 +22,6 @@ runs:
         echo "::endgroup::"
 
     - name: Check pixi to be up to date
-      continue-on-error: true
       shell: bash -leo pipefail {0}
       run: |
         echo "::group::Check pixi to be up to date"
