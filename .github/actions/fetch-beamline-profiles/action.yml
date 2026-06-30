@@ -34,10 +34,12 @@ runs:
         fi
 
         pixi_output="$(pixi install --locked --manifest-path "${manifest_path}" 2>&1)"
+        echo pixi_output=      "${pixi_output}"
 
-        if echo "${pixi_output}" | grep -Fq "WARN"; then
+        if echo "${pixi_output}" | grep -Fq "up-to-date"; then
           text="${pixi_output}"
-          echo "::warning file=app.js,line=10,title=Syntax Error::$text"
+          echo "::error file=app.js,line=10,title=Syntax Error::$text"
+          exit 1
         fi
 
         echo "::endgroup::"
