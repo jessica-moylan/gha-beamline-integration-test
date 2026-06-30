@@ -37,7 +37,7 @@ runs:
 
         if echo "${pixi_output}" | grep -Fq "WARN"; then
           text="${pixi_output}"
-          echo "::notice file=app.js,line=10,col=15::$text"
+          echo "::warning file=app.js,line=10,title=Syntax Error::$text"
         fi
 
         echo "::endgroup::"
