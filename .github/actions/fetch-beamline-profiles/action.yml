@@ -27,7 +27,7 @@ runs:
       run: |
         echo "::group::Check pixi to be up to date"
         manifest_path="${CLONED_REPO}/pixi.toml"
-        
+
         if [ ! -f "${manifest_path}" ]; then
           echo "pixi.toml not found at ${manifest_path}. Exiting..."
           exit 1
@@ -36,7 +36,8 @@ runs:
         pixi_output="$(pixi install --locked --manifest-path "${manifest_path}" 2>&1)"
 
         if echo "${pixi_output}" | grep -Fq "WARN"; then
-          echo "::warning::pixi gave the following error: ${pixi_output}
+          text="${pixi_output}"
+          echo "::notice file=app.js,line=10,col=15::$text"
         fi
 
         echo "::endgroup::"
