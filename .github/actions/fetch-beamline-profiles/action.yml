@@ -21,8 +21,7 @@ runs:
         git clone -b "${BRANCH}" "https://github.com/${REPO_SLUG}" ${CLONED_REPO}
         echo "::endgroup::"
 
-    - name: Check pixi to be up to date
-      continue-on-error: true
+    - name: Pixi environment set-up
       shell: bash -leo pipefail {0}
       run: |
         echo "::group::Check pixi to be up to date"
@@ -36,16 +35,12 @@ runs:
         pixi_output="$(pixi install --locked --manifest-path "${manifest_path}" 2>&1)"
 
         if echo "${pixi_output}" | grep -Fq "up-to-date"; then
-          text="${pixi_output}"
-          echo "::warning file=app.js,line=10,title=Syntax Error::$text"
-          exit 1
+          text="For ${endstation} environment: ${pixi_output}"
+          echo "::warning file=app.js,line=10,title=Pixi.lock Issue::$text"
         fi
 
         echo "::endgroup::"
 
-    - name: Install pixi profile environment
-      shell: bash -leo pipefail {0}
-      run: |
         echo "::group::Install pixi profile environment"
         pixi --version
         pixi install --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }}
