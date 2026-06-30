@@ -26,11 +26,19 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         echo "::group::Check pixi to be up to date"
-        pixi install --locked --manifest-path ${CLONED_REPO}/pixi.toml
-        if [ pixi install --locked --manifest-path ${CLONED_REPO}/pixi.toml | grep "WARN" ]; then
-            echo "pixi.toml not found in ${CLONED_REPO}. Exiting..."
-            exit 1
+        manifest_path="${CLONED_REPO}/pixi.toml"
+        
+        if [ ! -f "${manifest_path}" ]; then
+          echo "pixi.toml not found at ${manifest_path}. Exiting..."
+          exit 1
         fi
+
+        pixi_output="$(pixi install --locked --manifest-path "${manifest_path}" 2>&1)"
+
+        if echo "${pixi_output}" | grep -Fq "WARN"; then
+          echo "::warning::pixi gave the following error: ${pixi_output}
+        fi
+
         echo "::endgroup::"
 
     - name: Install pixi profile environment
