@@ -35,7 +35,7 @@ runs:
         pixi_output="$(pixi install --locked --manifest-path "${manifest_path}" 2>&1)"
 
         if echo "${pixi_output}" | grep -Fq "up-to-date"; then
-          text="For ${endstation} environment: ${pixi_output}"
+          text="For ${{ matrix.endstation }} endstation: ${pixi_output}"
           echo "::warning file=app.js,line=10,title=Pixi.lock Issue::$text"
         fi
 
