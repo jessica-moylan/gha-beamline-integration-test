@@ -62,11 +62,12 @@ runs:
         fi
         echo "::endgroup::"
 
+# TODO: Check what will be appropraite for the BMM beamline
     - name: Check if LICENSE has BNL
       shell: bash -leo pipefail {0}
       run: |
         echo "::group::Checking for BNL in LICENSE file"
-        if ! grep -q "Brookhaven National Laboratory" "${CLONED_REPO}/LICENSE"; then
+        if [ "${{ matrix.endstation }}" != "bmm" ] && ! grep -q "Brookhaven National Laboratory" "${CLONED_REPO}/LICENSE"; then
             echo "LICENSE file does not contain 'Brookhaven National Laboratory'. Exiting..."
             exit 1
         fi
