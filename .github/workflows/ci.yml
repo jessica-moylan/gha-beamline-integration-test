@@ -28,7 +28,7 @@ jobs:
           - tes
           - xfp
         include:
-          - { endstation: bmm, redis-host: xf17id1-bmm-redis1.nsls2.bnl.gov, repo: bmm-profile-collection, branch: main } #need to find correct redis-host
+          - { endstation: bmm, redis-host: xf06bm-bmm-redis1.nsls2.bnl.gov, repo: bmm-profile-collection, branch: main }
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
