@@ -42,18 +42,28 @@ runs:
 
         tiled_profiles_dir="$HOME/.config/tiled/profiles/"
         mkdir -v -p "${tiled_profiles_dir}"
-        cat << EOF > ${tiled_profiles_dir}/profiles.yml
-        ${ENDSTATION_ACRONYM}:
-          direct:
-            authentication:
-              allow_anonymous_access: true
-            trees:
-            - tree: databroker.mongo_normalized:Tree.from_uri
-              path: /
-              args:
-                uri: mongodb://localhost:27017/metadatastore-local
-                asset_registry_uri: mongodb://localhost:27017/asset-registry-local
-        EOF
+
+        if grep -qw "${BEAMLINE_ACRONYM}" /post_data_secuirty.txt; then
+          cat << EOF > ${tiled_profiles_dir}/profiles.yml
+          ${ENDSTATION_ACRONYM}:
+            direct:
+              authentication:
+                allow_anonymous_access: true
+              trees:
+              - tree: databroker.mongo_normalized:Tree.from_uri
+                path: /
+                args:
+                  uri: mongodb://localhost:27017/metadatastore-local
+                  asset_registry_uri: mongodb://localhost:27017/asset-registry-local
+          EOF
+
+        else
+          cat << EOF > ${tiled_profiles_dir}/profiles.yml
+          ${ENDSTATION_ACRONYM}:
+            uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/${ENDSTATION_ACRONYM}/raw
+          EOF
+
+        fi
 
         sudo mkdir -v -p /etc/bluesky/
         cat << EOF | sudo tee /etc/bluesky/kafka.yml
