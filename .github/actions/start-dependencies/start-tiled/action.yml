@@ -162,11 +162,6 @@ runs:
         # key-protected mock. `api_key` is not an allowed top-level field in
         # the profile schema, but `headers` is.
         mkdir -p "$HOME/.config/tiled/profiles"
-        cat > "$HOME/.config/tiled/profiles/profiles.yml" <<EOF
-        pdf: 
-          uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/pdf/raw
-        EOF
-
         cat > "$HOME/.config/tiled/profiles/nsls2.yml" <<EOF
         nsls2:
           uri: https://tiled.nsls2.bnl.gov
