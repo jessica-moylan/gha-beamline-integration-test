@@ -53,7 +53,7 @@ jobs:
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@19eac09b398e3d0c747adc7921926a6d802df4da # v0.8.8
         with:
-          pixi-version: v0.56.0
+          pixi-version: v0.71.3
           run-install: false
           cache: false
 
@@ -95,7 +95,7 @@ jobs:
             export MKL_NUM_THREADS=1
             
             command="
-            import io, os, glob, sys, traceback
+            import io, os, glob, sys, traceback, warnings
 
             # Get system arguments, needed currently for SIX with user inputs
             # TODO: do both SIX endatations, six and keithley, need to be tested?
@@ -103,6 +103,27 @@ jobs:
             six_endstation1 = 'six'
 
             ip = get_ipython()
+
+            # Test for CI  for fixxing startup files do not fail when authentication.links is None.
+            try:
+                from tiled.client.context import Context
+
+                def _ci_fixed_whoami(self):
+                    auth = getattr(self.server_info, 'authentication', None)
+                    links = getattr(auth, 'links', None)
+                    if links:
+                        return self.http_client.get(
+                            links.whoami,
+                            headers={'Accept': 'application/x-msgpack'},
+                        ).json()
+                    else:
+                        warnings.warn('Authentication providers were not configured on the server.')
+
+                Context.whoami = _ci_fixed_whoami
+                print('Applied CI monkey patch for tiled Context.whoami')
+            except Exception as exc:
+                print(f'Could not apply Tiled monkey patch: {exc}')
+
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
             if os.path.isfile('.ci/drop-in.py'):
               startup_files.append('.ci/drop-in.py')
