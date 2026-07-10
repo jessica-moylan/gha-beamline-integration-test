@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule:
+    - cron: '00 6 * * *' # daily at 6AM UTC
   workflow_dispatch:
 jobs:
   testing_beamline_profiles:
@@ -24,7 +26,9 @@ jobs:
           - ixs
           - six
           - smi
+          - srx
           - nyx
+          - tes
           - xfp
         include:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
@@ -35,7 +39,9 @@ jobs:
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
           - { endstation: six, redis-host: xf02id1-six-redis1.nsls2.bnl.gov, repo: six-profile-collection, branch: main }
           - { endstation: smi, redis-host: xf12id2-smi-redis1.nsls2.bnl.gov, repo: smi-profile-collection, branch: main }
-          - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: jessica-moylan/nyx-profile-collection, branch: beamline-testing }
+          - { endstation: srx, redis-host: xf28id1-srx-redis1.nsls2.bnl.gov, repo: srx-profile-collection, branch: main } #need to find correct redis-host
+          - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
+          - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +55,7 @@ jobs:
         with:
           python-version: 3.11
 
-      # Set up pixi
+      # Set up pixi; Check https://github.com/NSLS2/nsls2rpms/pulls?q=+is%3Apr+ for current pixi version used on floor
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@19eac09b398e3d0c747adc7921926a6d802df4da # v0.8.8
         with:
