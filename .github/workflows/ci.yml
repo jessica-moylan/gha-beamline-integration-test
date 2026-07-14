@@ -28,6 +28,7 @@ jobs:
           - smi
           - srx
           - nyx
+          - opls
           - tes
           - xfp
         include:
@@ -39,6 +40,7 @@ jobs:
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
           - { endstation: six, redis-host: xf02id1-six-redis1.nsls2.bnl.gov, repo: six-profile-collection, branch: main }
           - { endstation: smi, redis-host: xf12id2-smi-redis1.nsls2.bnl.gov, repo: smi-profile-collection, branch: main }
+          - { endstation: opls, redis-host: xf12id1-opls-redis1.nsls2.bnl.gov, repo: opls-profile-collection, branch: main } #need to find correct redis-host
           - { endstation: srx, redis-host: xf28id1-srx-redis1.nsls2.bnl.gov, repo: srx-profile-collection, branch: main } #need to find correct redis-host
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
           - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
@@ -131,6 +133,7 @@ jobs:
                 print(f'Could not apply Tiled monkey patch: {exc}')
 
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
+            print(f'Found startup files: {os.getcwd()}/startup/*.py -> {startup_files}')
             if os.path.isfile('.ci/drop-in.py'):
               startup_files.append('.ci/drop-in.py')
             if not startup_files:
@@ -151,7 +154,9 @@ jobs:
 
                     sys.stdin = sys.__stdin__
                     sys.argv = [sys.argv[0]]
-
+                  elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
+                    RE.md['proposal_number'] = '123456'
+                    RE.md['main_proposer'] = 'test_user'
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
