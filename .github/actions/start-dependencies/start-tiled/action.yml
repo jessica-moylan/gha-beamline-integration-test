@@ -192,20 +192,10 @@ runs:
           get_or_create_container(beamline, 'migration', specs=['CatalogOfBlueskyRuns'])
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
         elif tla == 'opls':
-          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'], metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
-          md = dict(getattr(raw, "metadata", {}) or {})
-          changed = False
-          if "proposal_number" not in md:
-              md["proposal_number"] = 123456
-              changed = True
-          if "main_proposer" not in md:
-              md["main_proposer"] = "test_user"
-              changed = True
-
-          if changed:
-              raw.update_metadata(md)
-          print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-          print(client[tla]["raw"].metadata)
+          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
+          
+          client[tla]["raw"].update_metadata({'proposal_number': 123456, 'main_proposer': 'test_user'})
+         
         else:
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])"
           
