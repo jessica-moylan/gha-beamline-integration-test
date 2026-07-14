@@ -192,11 +192,12 @@ runs:
           get_or_create_container(beamline, 'migration', specs=['CatalogOfBlueskyRuns'])
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
         elif tla == 'opls':
+          print('Creating raw container for OPLS')
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
-          
-          client[tla]["raw"].update_metadata({'proposal_number': 123456, 'main_proposer': 'test_user'})
+          client[tla]['raw'].update_metadata(metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
          
         else:
-          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])"
+          get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
+        "
           
       shell: bash
