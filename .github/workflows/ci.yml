@@ -104,11 +104,16 @@ jobs:
               startup_files.append('.ci/drop-in.py')
             if not startup_files:
               raise SystemExit(f'Cannot find any startup files in {os.getcwd()}')
+            tla = os.getenv('BEAMLINE_ACRONYM', os.getenv('ENDSTATION_ACRONYM', '')).lower()
+
             for f in startup_files:
               if not os.path.isfile(f):
                 raise FileNotFoundError(f'File {f} cannot be found.')
               print(f'Executing {f} in CI')
               try:
+                if f.endswith('01-prompt.py') and tla == 'opls':
+                  client['opls']['raw'].update_metadata(metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
+                  print(client['opls']['raw'].metadata)
                 ip.parent._exec_file(f)
               except Exception as e:
                 print(f'ERROR in {f}:')
