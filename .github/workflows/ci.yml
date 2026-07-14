@@ -112,7 +112,8 @@ jobs:
               print(f'Executing {f} in CI')
               try:
                 if f.endswith('01-prompt.py') and tla == 'opls':
-                  RE.md.update_metadata(metadata={'proposal_number': 123456, 'main_proposer': 'test_user'})
+                  RE.md['proposal_number'] = 123456
+                  RE.md['main_proposer'] = 'test_user'
                   print(RE.md.metadata)
                 ip.parent._exec_file(f)
               except Exception as e:
