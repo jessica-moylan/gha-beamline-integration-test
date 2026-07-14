@@ -114,7 +114,7 @@ jobs:
                 if f.endswith('01-prompt.py') and tla == 'opls':
                   RE.md['proposal_number'] = 123456
                   RE.md['main_proposer'] = 'test_user'
-                  print(RE.md.metadata)
+                  print(RE.md['proposal_number'], RE.md['main_proposer'])
                 ip.parent._exec_file(f)
               except Exception as e:
                 print(f'ERROR in {f}:')
