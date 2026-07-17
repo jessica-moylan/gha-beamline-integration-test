@@ -106,7 +106,7 @@ jobs:
 
             # Need to set enviornment variables to --proc for LIX, no hardware, data access only
             if [ "${{ matrix.endstation }}" = "lix" ]; then
-              echo "BS_CONFIG=proc" >> $BS_CONFIG
+              echo "BS_CONFIG=proc" >> $GITHUB_ENV
             fi
             
             command="
