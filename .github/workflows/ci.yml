@@ -103,6 +103,11 @@ jobs:
             export OMP_NUM_THREADS=1
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
+
+            # Need to set enviornment variables to --proc for LIX, no hardware, data access only
+            if [ "${{ matrix.endstation }}" = "lix" ]; then
+              echo "BS_CONFIG=proc" >> $BS_CONFIG
+            fi
             
             command="
             import io, os, glob, sys, traceback, warnings
