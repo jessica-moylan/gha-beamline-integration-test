@@ -36,7 +36,7 @@ jobs:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
-          - { endstation: hxn, redis-host: xf03id1-hxn-redis1.nsls2.bnl.gov, repo: hxn-profile-collection, branch: main }
+          - { endstation: hxn, redis-host: xf03id1-hxn-redis1.nsls2.bnl.gov, repo: jessica-moylan/hxn-profile-collection, branch: fixing_bl-specifc.sh }
           - { endstation: ios, redis-host: xf23id1-ios-redis1.nsls2.bnl.gov, repo: ios-profile-collection, branch: main }  
           - { endstation: isr, redis-host: xf23id1-isr-redis1.nsls2.bnl.gov, repo: jessica-moylan/isr-profile-collection, branch: LICENSE } #need to find correct redis-host
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
