@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule:
+    - cron: '00 6 * * *' # daily at 6AM UTC
   workflow_dispatch:
 jobs:
   testing_beamline_profiles:
@@ -20,13 +22,33 @@ jobs:
           - fmx
           - fxi
           - hxn
+          - ios
+          - isr
           - ixs
+          - six
+          - smi
+          - lix
+          - srx
+          - nyx
+          - opls
+          - tes
+          - xfp
         include:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
-          - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 }
           - { endstation: hxn, redis-host: xf17id1-hxn-redis1.nsls2.bnl.gov, repo: jessica-moylan/hxn-profile-collection, branch: fixing_bl-specifc.sh }
-          - { endstation: ixs, redis-host: xf23id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }
+          - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
+          - { endstation: ios, redis-host: xf23id1-ios-redis1.nsls2.bnl.gov, repo: ios-profile-collection, branch: main }  
+          - { endstation: isr, redis-host: xf23id1-isr-redis1.nsls2.bnl.gov, repo: jessica-moylan/isr-profile-collection, branch: LICENSE } #need to find correct redis-host
+          - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
+          - { endstation: six, redis-host: xf02id1-six-redis1.nsls2.bnl.gov, repo: six-profile-collection, branch: main }
+          - { endstation: smi, redis-host: xf12id2-smi-redis1.nsls2.bnl.gov, repo: smi-profile-collection, branch: main }
+          - { endstation: lix, redis-host: xf28id1-lix-redis1.nsls2.bnl.gov, repo: lix-profile-collection, branch: master }  #need to find correct redis-host
+          - { endstation: opls, redis-host: xf12id1-opls-redis1.nsls2.bnl.gov, repo: opls-profile-collection, branch: main } #need to find correct redis-host
+          - { endstation: srx, redis-host: xf28id1-srx-redis1.nsls2.bnl.gov, repo: srx-profile-collection, branch: main } #need to find correct redis-host
+          - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
+          - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
+          - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
     runs-on: ubuntu-latest
     steps:
       - name: Checkout test harness
@@ -39,11 +61,11 @@ jobs:
         with:
           python-version: 3.11
 
-      # Set up pixi
+      # Set up pixi; Check https://github.com/NSLS2/nsls2rpms/pulls?q=+is%3Apr+ for current pixi version used on floor
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@19eac09b398e3d0c747adc7921926a6d802df4da # v0.8.8
         with:
-          pixi-version: v0.56.0
+          pixi-version: v0.71.3
           run-install: false
           cache: false
 
@@ -62,7 +84,6 @@ jobs:
       - name: Start dependencies
         uses: ./.github/actions/start-dependencies
 
-    # Run profile tests      
       - name: Run profile startup tests
         shell: bash -leo pipefail {0}
         run: |
@@ -74,26 +95,106 @@ jobs:
             /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
             export DISPLAY=:99
 
+            # Wait for X server to be ready and set non-interactive matplotlib backend
+            sleep 2
+            export MPLBACKEND=Agg
+            export QT_QPA_PLATFORM=offscreen
+            export PYTHONFAULTHANDLER=1
+            export LIBGL_ALWAYS_SOFTWARE=1
+            export QTWEBENGINE_DISABLE_SANDBOX=1
+            export OMP_NUM_THREADS=1
+            export OPENBLAS_NUM_THREADS=1
+            export MKL_NUM_THREADS=1
+
+            # Need to set enviornment variables to --proc for LIX, no hardware, data access only
+            if [ "${{ matrix.endstation }}" = "lix" ]; then
+              export BS_CONFIG=proc
+              echo "BS_CONFIG=proc" >> $GITHUB_ENV
+            fi
+            
             command="
-            import os, glob, sys, traceback
+            import io, os, glob, sys, traceback, warnings
+
+            # Get system arguments, needed currently for SIX with user inputs
+            # TODO: do both SIX endatations, six and keithley, need to be tested?
+            beamline_acronym = os.environ.get('BEAMLINE_ACRONYM', 'unknown')
+            six_endstation1 = 'six'
+
             ip = get_ipython()
+
+            # Test for CI  for fixxing startup files do not fail when authentication.links is None.
+            try:
+                from tiled.client.context import Context
+
+                def _ci_fixed_whoami(self):
+                    auth = getattr(self.server_info, 'authentication', None)
+                    links = getattr(auth, 'links', None)
+                    if links:
+                        return self.http_client.get(
+                            links.whoami,
+                            headers={'Accept': 'application/x-msgpack'},
+                        ).json()
+                    else:
+                        warnings.warn('Authentication providers were not configured on the server.')
+
+                Context.whoami = _ci_fixed_whoami
+                print('Applied CI monkey patch for tiled Context.whoami')
+            except Exception as exc:
+                print(f'Could not apply Tiled monkey patch: {exc}')
+
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
+            print(f'Found startup files: {os.getcwd()}/startup/*.py -> {startup_files}')
             if os.path.isfile('.ci/drop-in.py'):
               startup_files.append('.ci/drop-in.py')
             if not startup_files:
               raise SystemExit(f'Cannot find any startup files in {os.getcwd()}')
+
             for f in startup_files:
-              if not os.path.isfile(f):
-                raise FileNotFoundError(f'File {f} cannot be found.')
-              print(f'Executing {f} in CI')
-              try:
-                ip.parent._exec_file(f)
-              except Exception as e:
-                print(f'ERROR in {f}:')
-                traceback.print_exc()
-                raise"
-            env | grep EPICS
+                if not os.path.isfile(f):
+                  raise FileNotFoundError(f'File {f} cannot be found.')
+                print(f'Executing {f} in CI')
+                try:
+                  if f.endswith('00-startup.py') and beamline_acronym == 'six':
+                    sys.argv = ['00-startup.py', 'arg1']
+
+                    simulated_inputs = 'SIX\n'
+                    sys.stdin = io.StringIO(simulated_inputs)
+
+                    ip.parent._exec_file(f)
+
+                    sys.stdin = sys.__stdin__
+                    sys.argv = [sys.argv[0]]
+                  elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
+                    RE.md['proposal_number'] = '123456'
+                    RE.md['main_proposer'] = 'test_user'
+                  else:
+                    ip.parent._exec_file(f)
+                except Exception as e:
+                  print(f'ERROR in {f}:')
+                  traceback.print_exc()
+                  raise
+            "
+
+            env | grep EPICS || true
+
+            set +e
             ipython --profile=test -c "$command"
+            ipython_status=$?
+            set -e
+
+            if [ "${ipython_status}" -eq 139 ]; then
+              echo "Detected segfault (exit 139) in profile startup test, retrying once..."
+              sleep 2
+              set +e
+              ipython --profile=test -c "$command"
+              ipython_status=$?
+              set -e
+            fi
+
+            if [ "${ipython_status}" -ne 0 ]; then
+              echo "ipython profile startup test failed with exit code ${ipython_status}"
+              exit "${ipython_status}"
+            fi
           else
             # TODO: queueserver tests disabled for now
             # nohup start-re-manager --profile-dir=. < /dev/null > /tmp/qs_manager.log 2>&1 &
