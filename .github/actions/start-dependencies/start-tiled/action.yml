@@ -188,7 +188,7 @@ runs:
               return parent[key]
 
         beamline = get_or_create_container(client, tla)
-        if tla == 'smi':
+        if tla == 'smi' or tla == 'hxn':
           get_or_create_container(beamline, 'migration', specs=['CatalogOfBlueskyRuns'])
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
         elif tla == 'opls':
