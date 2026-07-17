@@ -26,6 +26,7 @@ jobs:
           - ixs
           - six
           - smi
+          - lix
           - srx
           - nyx
           - opls
@@ -40,6 +41,7 @@ jobs:
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
           - { endstation: six, redis-host: xf02id1-six-redis1.nsls2.bnl.gov, repo: six-profile-collection, branch: main }
           - { endstation: smi, redis-host: xf12id2-smi-redis1.nsls2.bnl.gov, repo: smi-profile-collection, branch: main }
+          - { endstation: lix, redis-host: xf28id1-lix-redis1.nsls2.bnl.gov, repo: lix-profile-collection, branch: master }  #need to find correct redis-host
           - { endstation: opls, redis-host: xf12id1-opls-redis1.nsls2.bnl.gov, repo: opls-profile-collection, branch: main } #need to find correct redis-host
           - { endstation: srx, redis-host: xf28id1-srx-redis1.nsls2.bnl.gov, repo: srx-profile-collection, branch: main } #need to find correct redis-host
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
@@ -101,6 +103,12 @@ jobs:
             export OMP_NUM_THREADS=1
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
+
+            # Need to set enviornment variables to --proc for LIX, no hardware, data access only
+            if [ "${{ matrix.endstation }}" = "lix" ]; then
+              export BS_CONFIG=proc
+              echo "BS_CONFIG=proc" >> $GITHUB_ENV
+            fi
             
             command="
             import io, os, glob, sys, traceback, warnings
