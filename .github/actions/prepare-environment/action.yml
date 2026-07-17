@@ -71,6 +71,10 @@ runs:
         # For IXS beamline
         if [ ${{ matrix.endstation }} == "ixs" ]; then
           mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/legacy
+
+        elif [ ${{ matrix.endstation }} == "lix" ]; then
+          # the 2026-1 directory is hard coded into the profile and will have to be updated when the "current cycle" changes. 
+          mkdir -v -p /nsls2/data/lix/legacy/2026-1
         fi
 
         # CSM
