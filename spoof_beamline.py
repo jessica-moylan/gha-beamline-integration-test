@@ -78,8 +78,6 @@ class BlackholeIOC(PVGroup):
             return ChannelData(value=10)
         elif 'TriggerMode' in key:
             return ChannelEnum(value=0, enum_strings=['Internal', 'External'])
-        elif 'Acquire' in key:
-            return ChannelEnum(value=0, enum_strings=['Start', 'Stop'])
         elif 'FileWriteMode' in key:
             return ChannelEnum(value=0, enum_strings=['Single'])
         elif 'FilePathExists' in key:
@@ -95,6 +93,8 @@ class BlackholeIOC(PVGroup):
             return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
+        elif 'Acquire' in key:
+            return ChannelEnum(value=0, enum_strings=['Start', 'Stop'])
         return ChannelDouble(value=0.0)
 
 
