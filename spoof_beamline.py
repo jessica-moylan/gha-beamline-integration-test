@@ -78,6 +78,8 @@ class BlackholeIOC(PVGroup):
             return ChannelData(value=10)
         elif 'TriggerMode' in key:
             return ChannelEnum(value=0, enum_strings=['Internal', 'External'])
+        elif 'Acquire' in key:
+            return ChannelEnum(value=0, enum_strings=['Start', 'Stop'])
         elif 'FileWriteMode' in key:
             return ChannelEnum(value=0, enum_strings=['Single'])
         elif 'FilePathExists' in key:
