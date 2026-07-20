@@ -69,6 +69,9 @@ jobs:
           run-install: false
           cache: false
 
+      - name: Start Blackhole IOC
+        uses: ./.github/actions/start-blackhole-ioc
+        
       - name: Fetch beamline profiles
         uses: ./.github/actions/fetch-beamline-profiles
         
