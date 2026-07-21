@@ -93,7 +93,7 @@ class BlackholeIOC(PVGroup):
             return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
-        elif 'Acquire' in key:
+        elif key.endswith(":Acquire"):
             return ChannelEnum(value=0, enum_strings=['Start', 'Stop'])
         return ChannelDouble(value=0.0)
 
