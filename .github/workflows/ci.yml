@@ -88,8 +88,6 @@ jobs:
         uses: ./.github/actions/start-dependencies
 
       - name: Run profile startup tests
-        env:
-          RUNNING_IN_NSLS2_CI: True
         shell: bash -leo pipefail {0}
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
@@ -175,8 +173,15 @@ jobs:
                     RE.md['proposal_number'] = '123456'
                     RE.md['main_proposer'] = 'test_user'
                   elif f.endswith('00-startup.py') and beamline_acronym == 'hex':
-                    os.environ['RUNNING_IN_NSLS2_CI'] = 'True'
-                    print(f'RUNNING_IN_NSLS2_CI={os.environ["RUNNING_IN_NSLS2_CI"]}')
+                    with open(f, 'r') as file:
+                      content = file.read()
+                    
+                    content = content.replace('RUNNING_IN_NSLS2_CI = False', 'RUNNING_IN_NSLS2_CI = True')
+                    
+                    with open(f, 'w') as file:
+                      file.write(content)
+
+                    ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
