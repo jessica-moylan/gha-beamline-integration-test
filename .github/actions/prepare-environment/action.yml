@@ -71,6 +71,16 @@ runs:
         # For IXS beamline
         if [ ${{ matrix.endstation }} == "ixs" ]; then
           mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/legacy
+
+        elif [ ${{ matrix.endstation }} == "lix" ]; then
+          # the 2026-1 directory is hard coded into the profile and will have to be updated when the "current cycle" changes. 
+          mkdir -v -p /nsls2/data/lix/legacy/2026-1
+        fi
+
+        # CSM
+        if [ ${{ matrix.endstation }} == "csm" ]; then
+          mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/proposals
+          mkdir -v -p "/nsls2/data3/${BEAMLINE_ACRONYM}/shared/config/bluesky/profile_collection/startup"
         fi
 
         # TODO: fix SRX and HXN hardcoded paths.
@@ -91,7 +101,26 @@ runs:
 
         mkdir -v -p $HOME/.ipython/
         # Copy the entire "startup" directory to the test profile.
+
+        echo "Copying ${CLONED_REPO} to $HOME/.ipython/profile_test"
         cp -rv "${CLONED_REPO}" $HOME/.ipython/profile_test
+
+        # For OPLS beamline, they have a specific .csv configuration files that needs to be acceessed in a certain directory
+        if [ "${BEAMLINE_ACRONYM}" == "opls" ]; then
+          mkdir -v -p /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/
+          cp -v /home/runner/opls-profile-collection/OPLS_attenuator_thickness.csv /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuator_thickness.csv
+          
+          echo "Creating opls_attenuators_database.csv in /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/"
+
+          printf '%s\n' \
+            'date,attenuators' \
+            '2025-01-27 14:50:22.581335,"{""Nb_9.7keV"": {""att0"": 1, ""att1"": 9.99, ""att2"": 10.9, ""att3"": 9.98, ""att4"": 10.62, ""att5"": 10.77, ""att6"": 10.39, ""att7"": 11.18}, ""Si_14.4keV"": {""att0"": 1, ""att1"": 14.0, ""att2"": 14.03, ""att3"": 14.0, ""att4"": 14.06, ""att5"": 14, ""att6"": 14.5}, ""Cu_16.1keV"": {""att0"": 1, ""att1"": 6.6, ""att2"": 6.7, ""att3"": 6.85, ""att4"": 6.6, ""att5"": 6.4, ""att6"": 6.75}, ""Al_23keV"": {""att0"": 1, ""att1"": 11.1, ""att2"": 11.2, ""att3"": 10.0, ""att4"": 11.5, ""att5"": 10.46}}"' \
+            '2025-01-27 14:50:22.581336,"{""Nb_9.7keV"": {""att0"": 1, ""att1"": 9.99, ""att2"": 10.9, ""att3"": 9.98, ""att4"": 10.62, ""att5"": 10.77, ""att6"": 10.39, ""att7"": 11.18}, ""Si_14.4keV"": {""att0"": 1, ""att1"": 14.0, ""att2"": 14.03, ""att3"": 14.0, ""att4"": 14.06, ""att5"": 14, ""att6"": 14.5}, ""Cu_16.1keV"": {""att0"": 1, ""att1"": 6.6, ""att2"": 6.7, ""att3"": 6.85, ""att4"": 6.6, ""att5"": 6.4, ""att6"": 6.75}, ""Al_23keV"": {""att0"": 1, ""att1"": 11.1, ""att2"": 11.2, ""att3"": 10.0, ""att4"": 11.5, ""att5"": 10.46}}"' \
+            > /nsls2/data/smi/opls/shared/config/operations/bsui_parameters/attenuators/opls_attenuators_database.csv
+
+        fi
+
+
         # Remove the top-level .py files as they will be loaded separately from
         # profile_collection/startup dir. That allows proper capturing of the
         # exit code in case IPython startup files have issues.
@@ -105,4 +134,7 @@ runs:
         {
             echo "EPICS_CA_AUTO_ADDR_LIST=NO"
             echo "EPICS_CA_ADDR_LIST=127.0.0.1"
+            echo "EPICS_PVA_AUTO_ADDR_LIST=NO"
+            echo "EPICS_PVA_ADDR_LIST=127.0.0.1"
+            echo "RUNNING_IN_NSLS2_CI=True"
         } >> $GITHUB_ENV
