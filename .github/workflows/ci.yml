@@ -90,8 +90,9 @@ jobs:
       - name: Run profile startup tests
         shell: bash -leo pipefail {0}
         run: |
-          export RUNNING_IN_NSLS2_CI=True
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
+          export RUNNING_IN_NSLS2_CI=True
+          echo "DEBUG: RUNNING_IN_NSLS2_CI=${RUNNING_IN_NSLS2_CI}"
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
           cd "${CLONED_REPO}"
 
@@ -182,7 +183,7 @@ jobs:
             env | grep EPICS || true
 
             set +e
-            ipython --profile=test -c "$command"
+            RUNNING_IN_NSLS2_CI=True ipython --profile=test -c "$command"
             ipython_status=$?
             set -e
 
@@ -190,7 +191,7 @@ jobs:
               echo "Detected segfault (exit 139) in profile startup test, retrying once..."
               sleep 2
               set +e
-              ipython --profile=test -c "$command"
+              RUNNING_IN_NSLS2_CI=True ipython --profile=test -c "$command"
               ipython_status=$?
               set -e
             fi
