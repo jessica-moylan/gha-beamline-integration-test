@@ -134,4 +134,7 @@ runs:
         {
             echo "EPICS_CA_AUTO_ADDR_LIST=NO"
             echo "EPICS_CA_ADDR_LIST=127.0.0.1"
+            echo "EPICS_PVA_AUTO_ADDR_LIST=NO"
+            echo "EPICS_PVA_ADDR_LIST=127.0.0.1"
+            echo "RUNNING_IN_NSLS2_CI=True"
         } >> $GITHUB_ENV

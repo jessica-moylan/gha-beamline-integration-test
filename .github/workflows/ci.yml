@@ -21,6 +21,7 @@ jobs:
           - csx
           - fmx
           - fxi
+          - hex
           - ios
           - isr
           - ixs
@@ -36,6 +37,7 @@ jobs:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
+          - { endstation: hex, redis-host: xf27id1-hex-redis1.nsls2.bnl.gov, repo: hex-profile-collection, branch: main } 
           - { endstation: ios, redis-host: xf23id1-ios-redis1.nsls2.bnl.gov, repo: ios-profile-collection, branch: main }  
           - { endstation: isr, redis-host: xf23id1-isr-redis1.nsls2.bnl.gov, repo: jessica-moylan/isr-profile-collection, branch: LICENSE } #need to find correct redis-host
           - { endstation: ixs, redis-host: xf10id1-ixs-redis1.nsls2.bnl.gov, repo: jessica-moylan/ixs-profile-collection, branch: LICENSE }  
@@ -66,6 +68,9 @@ jobs:
           pixi-version: v0.71.3
           run-install: false
           cache: false
+
+      - name: Start blackhole IOC
+        uses: ./.github/actions/start-blackhole-ioc
 
       - name: Fetch beamline profiles
         uses: ./.github/actions/fetch-beamline-profiles
@@ -165,6 +170,18 @@ jobs:
                   elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
                     RE.md['proposal_number'] = '123456'
                     RE.md['main_proposer'] = 'test_user'
+                  
+                  # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
+                  elif f.endswith('00-startup.py') and beamline_acronym == 'hex':
+                    with open(f, 'r') as file:
+                      content = file.read()
+                    
+                    content = content.replace('RUNNING_IN_NSLS2_CI = False', 'RUNNING_IN_NSLS2_CI = True')
+                    
+                    with open(f, 'w') as file:
+                      file.write(content)
+
+                    ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
@@ -228,6 +245,7 @@ jobs:
               fi
           }
           show_log "Blackhole IOC" /tmp/blackhole_ioc.log
+          show_log "PVA IOC" /tmp/pva_ioc.log
           show_log "Tiled server" /tmp/tiled.log
           # show_log "QS manager" /tmp/qs_manager.log  # TODO: re-enable when queueserver tests are active
           show_log "Caddy reverse proxy" /tmp/caddy.log
