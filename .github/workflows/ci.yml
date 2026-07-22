@@ -91,8 +91,6 @@ jobs:
         shell: bash -leo pipefail {0}
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
-          export RUNNING_IN_NSLS2_CI=True
-          echo "DEBUG: RUNNING_IN_NSLS2_CI=${RUNNING_IN_NSLS2_CI}"
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
           cd "${CLONED_REPO}"
 
@@ -172,6 +170,8 @@ jobs:
                   elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
                     RE.md['proposal_number'] = '123456'
                     RE.md['main_proposer'] = 'test_user'
+                  
+                  # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
                   elif f.endswith('00-startup.py') and beamline_acronym == 'hex':
                     with open(f, 'r') as file:
                       content = file.read()
@@ -193,7 +193,7 @@ jobs:
             env | grep EPICS || true
 
             set +e
-            RUNNING_IN_NSLS2_CI=True ipython --profile=test -c "$command"
+            ipython --profile=test -c "$command"
             ipython_status=$?
             set -e
 
@@ -201,7 +201,7 @@ jobs:
               echo "Detected segfault (exit 139) in profile startup test, retrying once..."
               sleep 2
               set +e
-              RUNNING_IN_NSLS2_CI=True ipython --profile=test -c "$command"
+              ipython --profile=test -c "$command"
               ipython_status=$?
               set -e
             fi
