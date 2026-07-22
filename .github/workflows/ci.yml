@@ -174,8 +174,9 @@ jobs:
                   elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
                     RE.md['proposal_number'] = '123456'
                     RE.md['main_proposer'] = 'test_user'
-                  elif f.endswith('01-globals.py') and beamline_acronym == 'hex':
-                    print(RUNNING_IN_NSLS2_CI)
+                  elif f.endswith('00-startup.py') and beamline_acronym == 'hex':
+                    os.environ['RUNNING_IN_NSLS2_CI'] = 'True'
+                    print(f'RUNNING_IN_NSLS2_CI={os.environ["RUNNING_IN_NSLS2_CI"]}')
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
