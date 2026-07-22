@@ -90,6 +90,7 @@ jobs:
       - name: Run profile startup tests
         shell: bash -leo pipefail {0}
         run: |
+          export RUNNING_IN_NSLS2_CI=True
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
           cd "${CLONED_REPO}"
@@ -233,6 +234,7 @@ jobs:
               fi
           }
           show_log "Blackhole IOC" /tmp/blackhole_ioc.log
+          show_log "PVA IOC" /tmp/pva_ioc.log
           show_log "Tiled server" /tmp/tiled.log
           # show_log "QS manager" /tmp/qs_manager.log  # TODO: re-enable when queueserver tests are active
           show_log "Caddy reverse proxy" /tmp/caddy.log
