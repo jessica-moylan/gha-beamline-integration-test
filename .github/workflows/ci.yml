@@ -108,6 +108,8 @@ jobs:
             export OMP_NUM_THREADS=1
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
+            export NSLS2_PROFILE_CI=True
+
 
             # Need to set enviornment variables to --proc for LIX, no hardware, data access only
             if [ "${{ matrix.endstation }}" = "lix" ]; then
