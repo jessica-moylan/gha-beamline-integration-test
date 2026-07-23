@@ -88,6 +88,8 @@ jobs:
         uses: ./.github/actions/start-dependencies
 
       - name: Run profile startup tests
+        env:
+          NSLS2_PROFILE_CI: "True"
         shell: bash -leo pipefail {0}
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
@@ -109,7 +111,6 @@ jobs:
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
             export NSLS2_PROFILE_CI=True
-
 
             # Need to set enviornment variables to --proc for LIX, no hardware, data access only
             if [ "${{ matrix.endstation }}" = "lix" ]; then
@@ -175,16 +176,8 @@ jobs:
                   
                   # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
                   elif f.endswith('01-globals.py') and beamline_acronym == 'hex':
-                    os.environ["NSLS2_PROFILE_CI"] = "True"
-                    # with open(f, 'r') as file:
-                    #   content = file.read()
-                    
-                    # content = content.replace('RUNNING_IN_NSLS2_CI = False', 'RUNNING_IN_NSLS2_CI = True')
-                    
-                    # with open(f, 'w') as file:
-                    #   file.write(content)
-
-                    ip.parent._exec_file(f)
+                   os.environ['NSLS2_PROFILE_CI'] = 'True'
+                   ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
