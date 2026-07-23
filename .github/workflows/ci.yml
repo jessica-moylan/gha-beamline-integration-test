@@ -176,7 +176,7 @@ jobs:
                   
                   # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
                   elif f.endswith('01-globals.py') and beamline_acronym == 'hex':
-                    RUNNING_IN_NSLS2_CI = os.environ["NSLS2_PROFILE_CI"] == 'True'
+                    RUNNING_IN_NSLS2_CI = os.environ['NSLS2_PROFILE_CI'] == 'True'
                     ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
