@@ -75,12 +75,32 @@ runs:
         elif [ ${{ matrix.endstation }} == "lix" ]; then
           # the 2026-1 directory is hard coded into the profile and will have to be updated when the "current cycle" changes. 
           mkdir -v -p /nsls2/data/lix/legacy/2026-1
-        fi
-
-        # CSM
-        if [ ${{ matrix.endstation }} == "csm" ]; then
+        elif [ ${{ matrix.endstation }} == "csm" ]; then
           mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/proposals
           mkdir -v -p "/nsls2/data3/${BEAMLINE_ACRONYM}/shared/config/bluesky/profile_collection/startup"
+        elif [ ${{ matrix.endstation }} == "pdf" ]; then
+          # This is to satisfy _load_beamline_config(glbl['blconfig_path'])
+          cat > "$HOME/.config/acq/pdf.yml" <<EOF
+          nsls2:
+            ARCHIVE_BASE_DIR_NAME: .userBeamtimeArchive
+            ARCHIVE_ROOT_DIR: /direct/XF28ID1/pe1_data
+            BASE_DIR: /direct/XF28ID1/pe2_data
+            BEAMLINE_HOST_NAME: [ xf28id1-ws2, xf28id1-ws3 ]
+            BEAMLINE_ID: 28-ID-1
+            BLCONFIG_DIR_NAME: xpdConfig
+            BLCONFIG_NAME: PDF_beamline_config.yml
+            CALIB_CONFIG_NAME: xpdAcq_calib_info.yml
+            DARK_WINDOW: 3000
+            FACILITY: NSLS-II
+            FRAME_ACQUIRE_TIME: 0.1
+            GLBL_YAML_NAME: glbl.yml
+            GROUP: PDF
+            HOME_DIR_NAME: xpdUser
+            IMAGE_FIELD: pe1_image
+            OWNER: PDF
+            SIMULATION: false
+            SHUTTER_CONF: { close: 0, open: 60 }
+          EOF
         fi
 
         # TODO: fix SRX and HXN hardcoded paths.
