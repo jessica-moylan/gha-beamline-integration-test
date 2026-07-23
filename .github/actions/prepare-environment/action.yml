@@ -80,6 +80,7 @@ runs:
           mkdir -v -p "/nsls2/data3/${BEAMLINE_ACRONYM}/shared/config/bluesky/profile_collection/startup"
         elif [ ${{ matrix.endstation }} == "pdf" ]; then
           # This is to satisfy _load_beamline_config(glbl['blconfig_path'])
+          mkdir -v -p $HOME/.config/acq
           cat > "$HOME/.config/acq/pdf.yml" <<EOF
         ARCHIVE_BASE_DIR_NAME: .userBeamtimeArchive
         ARCHIVE_ROOT_DIR: /direct/XF28ID1/pe1_data
