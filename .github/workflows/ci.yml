@@ -88,8 +88,6 @@ jobs:
         uses: ./.github/actions/start-dependencies
 
       - name: Run profile startup tests
-        env:
-          NSLS2_PROFILE_CI: True
         shell: bash -leo pipefail {0}
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
@@ -174,16 +172,17 @@ jobs:
                     RE.md['main_proposer'] = 'test_user'
                   
                   # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
-                  # elif f.endswith('00-startup.py') and beamline_acronym == 'hex':
-                  #   with open(f, 'r') as file:
-                  #     content = file.read()
+                  elif f.endswith('01-globals.py') and beamline_acronym == 'hex':
+                    os.environ["NSLS2_PROFILE_CI"] = "True"
+                    # with open(f, 'r') as file:
+                    #   content = file.read()
                     
-                  #   content = content.replace('RUNNING_IN_NSLS2_CI = False', 'RUNNING_IN_NSLS2_CI = True')
+                    # content = content.replace('RUNNING_IN_NSLS2_CI = False', 'RUNNING_IN_NSLS2_CI = True')
                     
-                  #   with open(f, 'w') as file:
-                  #     file.write(content)
+                    # with open(f, 'w') as file:
+                    #   file.write(content)
 
-                  #   ip.parent._exec_file(f)
+                    ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
