@@ -110,7 +110,6 @@ jobs:
             export OMP_NUM_THREADS=1
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
-            export NSLS2_PROFILE_CI=True
 
             # Need to set enviornment variables to --proc for LIX, no hardware, data access only
             if [ "${{ matrix.endstation }}" = "lix" ]; then
@@ -176,8 +175,8 @@ jobs:
                   
                   # TODO: Is there a cleaner way to do this without having to modify the file? Perhaps using other types of overrides
                   elif f.endswith('01-globals.py') and beamline_acronym == 'hex':
-                   os.environ['NSLS2_PROFILE_CI'] = 'True'
-                   ip.parent._exec_file(f)
+                    RUNNING_IN_NSLS2_CI = os.environ["NSLS2_PROFILE_CI"] == 'True'
+                    ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
