@@ -89,7 +89,7 @@ jobs:
 
       - name: Run profile startup tests
         env:
-          RUNNING_IN_NSLS2_CI: True
+          NSLS2_PROFILE_CI: True
         shell: bash -leo pipefail {0}
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
