@@ -97,6 +97,8 @@ runs:
         GROUP: PDF
         HOME_DIR_NAME: xpdUser
         IMAGE_FIELDS: pe1_image
+        EXP_BROKER_NAME: pdf
+        SHUTTER_SLEEP: 0.1
         OWNER: PDF
         SIMULATION: false
         SHUTTER_CONF: { close: 0, open: 60 }
