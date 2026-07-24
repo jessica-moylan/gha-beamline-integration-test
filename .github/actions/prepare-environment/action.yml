@@ -96,7 +96,7 @@ runs:
         GLBL_YAML_NAME: glbl.yml
         GROUP: PDF
         HOME_DIR_NAME: xpdUser
-        IMAGE_FIELD: pe1_image
+        IMAGE_FIELDS: pe1_image
         OWNER: PDF
         SIMULATION: false
         SHUTTER_CONF: { close: 0, open: 60 }
