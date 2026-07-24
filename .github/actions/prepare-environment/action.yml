@@ -88,6 +88,7 @@ runs:
         BEAMLINE_HOST_NAME: [ xf28id1-ws2, xf28id1-ws3 ]
         BEAMLINE_ID: 28-ID-1
         BLCONFIG_DIR_NAME: xpdConfig
+        BLCONFIG_PATH: .config/acq/pdf.yml
         BLCONFIG_NAME: PDF_beamline_config.yml
         CALIB_CONFIG_NAME: xpdAcq_calib_info.yml
         DARK_WINDOW: 3000
