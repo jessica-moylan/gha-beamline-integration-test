@@ -66,6 +66,9 @@ jobs:
           pixi-version: v0.71.3
           run-install: false
           cache: false
+      
+      - name: Start Blackhole IOC
+        uses: ./.github/actions/start-blackhole-ioc
 
       - name: Fetch beamline profiles
         uses: ./.github/actions/fetch-beamline-profiles
