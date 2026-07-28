@@ -161,13 +161,13 @@ runs:
         # which otherwise tries anonymous access and fails against our
         # key-protected mock. `api_key` is not an allowed top-level field in
         # the profile schema, but `headers` is.
-        mkdir -p "$HOME/.config/tiled/profiles"
-        cat > "$HOME/.config/tiled/profiles/nsls2.yml" <<EOF
-        nsls2:
-          uri: https://tiled.nsls2.bnl.gov
-          headers:
-            Authorization: "Apikey ${TILED_SERVER_API_KEY}"
-        EOF
+        # mkdir -p "$HOME/.config/tiled/profiles"
+        # cat > "$HOME/.config/tiled/profiles/nsls2.yml" <<EOF
+        # nsls2:
+        #   uri: https://tiled.nsls2.bnl.gov
+        #   headers:
+        #     Authorization: "Apikey ${TILED_SERVER_API_KEY}"
+        # EOF
 
         python3 -c "
         import os
