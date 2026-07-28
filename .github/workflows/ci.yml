@@ -87,6 +87,8 @@ jobs:
         run: |
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
+          echo "DEBUG: TILED_API_KEY=${TILED_API_KEY}"
+          echo "DEBUG: TILED_SERVER_API_KEY=${TILED_SERVER_API_KEY}"
           cd "${CLONED_REPO}"
 
           if [ "${{ matrix.pixi-env }}" = "terminal" ]; then
