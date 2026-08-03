@@ -43,10 +43,10 @@ runs:
         tiled_profiles_dir="$HOME/.config/tiled/profiles/"
         mkdir -v -p "${tiled_profiles_dir}"
 
-        if grep -qw "${BEAMLINE_ACRONYM}" $GITHUB_WORKSPACE/configs/post_data_security.txt; then
+        # if grep -qw "${BEAMLINE_ACRONYM}" $GITHUB_WORKSPACE/configs/post_data_security.txt; then
           
-          echo "Beamline ${BEAMLINE_ACRONYM} is in the post_data_security.txt file, creating a direct profile for Tiled"
-          cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
+        #   echo "Beamline ${BEAMLINE_ACRONYM} is in the post_data_security.txt file, creating a direct profile for Tiled"
+        cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
         ${ENDSTATION_ACRONYM}:
           direct:
             authentication:
@@ -58,13 +58,13 @@ runs:
                   uri: mongodb://localhost:27017/metadatastore-local
                   asset_registry_uri: mongodb://localhost:27017/asset-registry-local
         EOF
-          cat "${tiled_profiles_dir}/profiles.yml"
-        else
-          cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
-        ${ENDSTATION_ACRONYM}:
-          uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/${ENDSTATION_ACRONYM}/raw
-        EOF
-        fi
+        #   cat "${tiled_profiles_dir}/profiles.yml"
+        # else
+        cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
+        # ${ENDSTATION_ACRONYM}:
+        #   uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/${ENDSTATION_ACRONYM}/raw
+        # EOF
+        # fi
 
         sudo mkdir -v -p /etc/bluesky/
         cat << EOF | sudo tee /etc/bluesky/kafka.yml
