@@ -56,12 +56,12 @@ runs:
                   args:
                     uri: mongodb://localhost:27017/metadatastore-local
                     asset_registry_uri: mongodb://localhost:27017/asset-registry-local
-          EOF
+        EOF
         else
           cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
           ${ENDSTATION_ACRONYM}:
             uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/${ENDSTATION_ACRONYM}/raw
-          EOF
+        EOF
         fi
 
         echo "############################################"
