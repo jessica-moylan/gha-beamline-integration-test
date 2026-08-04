@@ -152,43 +152,43 @@ jobs:
                 
             # Monkey Patch the xpdAcq _load_beamline_config since 1.0.0 does not have the pass for CI
             try:
-                import xpdacq
-                from xpdacq.xpdacq_conf import _load_beamline_config
+              import xpdacq
+              from xpdacq.xpdacq_conf import _load_beamline_config
 
-                  def _ci_load_beamline_config(beamline_config_fp, verif="", test=False):
-                    if (not test) and (not os.path.isfile(beamline_config_fp)):
-                        raise xpdacq.tools.xpdAcqException(
-                            "WARNING: can not find long term beamline "
-                            "configuration file. Please contact the "
-                            "beamline scientist ASAP"
-                        )
-                    pp = pprint.PrettyPrinter()
-                    os_type = platform.system()
-                    if os_type == "Windows":
-                        editor = "notepad"
-                    else:
-                        editor = os.environ.get("EDITOR", "vim")
-                    beamline_config = dict()
-                    if not test:
-                        while verif.upper() not in ("Y", "YES"):
-                            with open(beamline_config_fp, "r") as f:
-                                beamline_config = yaml.unsafe_load(f)
-                            pp.pprint(beamline_config)
-                            verif = input("\nIs this configuration correct? y/n: ")
-                            if verif.upper() in ("N", "NO"):
-                                print("Edit, save, and close the configuration file.\n")
-                                subprocess.call([editor, beamline_config_fp])
-                        beamline_config["Verified by"] = input("Please input your initials: ")
-                        timestamp = datetime.datetime.now()
-                        beamline_config["Verification time"] = timestamp.strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
-                        with open(beamline_config_fp, "w") as f:
-                            yaml.dump(beamline_config, f)
-                    return beamline_config
+              def _ci_load_beamline_config(beamline_config_fp, verif='', test=False):
+                  if (not test) and (not os.path.isfile(beamline_config_fp)):
+                      raise xpdacq.tools.xpdAcqException(
+                          'WARNING: can not find long term beamline '
+                          'configuration file. Please contact the '
+                          'beamline scientist ASAP'
+                      )
+                  pp = pprint.PrettyPrinter()
+                  os_type = platform.system()
+                  if os_type == 'Windows':
+                      editor = 'notepad'
+                  else:
+                      editor = os.environ.get('EDITOR', 'vim')
+                  beamline_config = dict()
+                  if not test:
+                      while verif.upper() not in ('Y', 'YES'):
+                          with open(beamline_config_fp, 'r') as f:
+                              beamline_config = yaml.unsafe_load(f)
+                          pp.pprint(beamline_config)
+                          verif = input('\nIs this configuration correct? y/n: ')
+                          if verif.upper() in ('N', 'NO'):
+                              print('Edit, save, and close the configuration file.\n')
+                              subprocess.call([editor, beamline_config_fp])
+                      beamline_config['Verified by'] = input('Please input your initials: ')
+                      timestamp = datetime.datetime.now()
+                      beamline_config['Verification time'] = timestamp.strftime(
+                          '%Y-%m-%d %H:%M:%S'
+                      )
+                      with open(beamline_config_fp, 'w') as f:
+                          yaml.dump(beamline_config, f)
+                  return beamline_config
 
-                xpdacq.xpdacq_conf._load_beamline_config = _ci_load_beamline_config
-                print('Applied CI monkey patch for xpdacq.xpdacq_conf._load_beamline_config')
+              xpdacq.xpdacq_conf._load_beamline_config = _ci_load_beamline_config
+              print('Applied CI monkey patch for xpdacq.xpdacq_conf._load_beamline_config')
             except Exception as exc:
                 print(f'Could not apply xpdacq.xpdacq_conf monkey patch: {exc}')
 
@@ -204,7 +204,7 @@ jobs:
                 print(f'Executing {f} in CI')
                 try:
                   if f.endswith('00-startup.py') and beamline_acronym == 'six':
-                    sys.argv = ['00-startup.py', 'arg1']
+                    sys.argv = ['00-startup.py', 'arg1']  # noqa: F405
 
                     simulated_inputs = 'SIX\n'
                     sys.stdin = io.StringIO(simulated_inputs)
@@ -213,15 +213,6 @@ jobs:
 
                     sys.stdin = sys.__stdin__
                     sys.argv = [sys.argv[0]]
-
-                  # Test to see if patch works
-                  elif f.endswith('970-load.py') and beamline_acronym == 'xpd':
-                    with open(f, 'r', encoding='utf-8') as file:
-                        # Read the entire file content into a variable
-                        file_contents = file.read()
-                        
-                        # Print the contents to the console
-                        print(file_contents)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
