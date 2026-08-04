@@ -1,5 +1,5 @@
 name: 'Stop services'
-description: 'Stops the blackhole IOC and stunnel services'
+description: 'Stops the blackhole IOC, PVA IOC, and stunnel services'
 runs:
   using: 'composite'
   steps:
@@ -14,5 +14,12 @@ runs:
       run: |
         if [ -n "${BLACKHOLE_IOC_PID:-}" ]; then
             kill -SIGINT "${BLACKHOLE_IOC_PID}" 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Kill PVA IOC
+      run: |
+        if [ -n "${PVA_IOC_PID:-}" ]; then
+            kill -SIGINT "${PVA_IOC_PID}" 2>/dev/null || true
         fi
       shell: bash
