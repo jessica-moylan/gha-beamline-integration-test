@@ -89,16 +89,20 @@ jobs:
 
           python3 << 'PATCH_STARTUP_EOF'
           import glob
+          import re
           from pathlib import Path
 
-          old = "_load_beamline_config(glbl['blconfig_path'])"
-          new = "_load_beamline_config(glbl['blconfig_path'], test = True)"
+          pattern = re.compile(
+              r"_load_beamline_config\(\s*glbl\[\s*(['\"])blconfig_path\1\s*\]\s*\)"
+          )
+          replacement = "_load_beamline_config(glbl['blconfig_path'], test=True)"
 
           for startup_file in sorted(glob.glob('startup/*.py')):
               path = Path(startup_file)
               text = path.read_text()
-              if old in text:
-                  path.write_text(text.replace(old, new))
+              patched = pattern.sub(replacement, text)
+              if patched != text:
+                path.write_text(patched)
           PATCH_STARTUP_EOF
 
           if [ "${{ matrix.pixi-env }}" = "terminal" ]; then
@@ -168,6 +172,14 @@ jobs:
                     sys.stdin = sys.__stdin__
                     sys.argv = [sys.argv[0]]
 
+                  # Test to see if patch works
+                  elif f.endswith('970-load.py') and beamline_acronym == 'xpd':
+                    with open(f, 'r', encoding='utf-8') as file:
+                        # Read the entire file content into a variable
+                        file_contents = file.read()
+                        
+                        # Print the contents to the console
+                        print(file_contents)
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
