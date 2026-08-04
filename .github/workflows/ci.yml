@@ -152,6 +152,10 @@ jobs:
                 
             # Monkey Patch the xpdAcq _load_beamline_config since 1.0.0 does not have the pass for CI
             try:
+              import platform
+              import subprocess
+              import yaml
+              import os
               import xpdacq
               from xpdacq.xpdacq_conf import _load_beamline_config
 
