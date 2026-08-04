@@ -162,7 +162,6 @@ jobs:
                           'configuration file. Please contact the '
                           'beamline scientist ASAP'
                       )
-                  pp = pprint.PrettyPrinter()
                   os_type = platform.system()
                   if os_type == 'Windows':
                       editor = 'notepad'
@@ -173,7 +172,6 @@ jobs:
                       while verif.upper() not in ('Y', 'YES'):
                           with open(beamline_config_fp, 'r') as f:
                               beamline_config = yaml.unsafe_load(f)
-                          pp.pprint(beamline_config)
                           verif = input('\nIs this configuration correct? y/n: ')
                           if verif.upper() in ('N', 'NO'):
                               print('Edit, save, and close the configuration file.\n')
