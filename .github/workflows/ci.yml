@@ -87,6 +87,20 @@ jobs:
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
           cd "${CLONED_REPO}"
 
+          python3 << 'PATCH_STARTUP_EOF'
+          import glob
+          from pathlib import Path
+
+          old = "_load_beamline_config(glbl['blconfig_path'])"
+          new = "_load_beamline_config(glbl['blconfig_path'], test = True)"
+
+          for startup_file in sorted(glob.glob('startup/*.py')):
+              path = Path(startup_file)
+              text = path.read_text()
+              if old in text:
+                  path.write_text(text.replace(old, new))
+          PATCH_STARTUP_EOF
+
           if [ "${{ matrix.pixi-env }}" = "terminal" ]; then
             /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
             export DISPLAY=:99
@@ -130,7 +144,7 @@ jobs:
                 Context.whoami = _ci_fixed_whoami
                 print('Applied CI monkey patch for tiled Context.whoami')
             except Exception as exc:
-                print(f'Could not apply Tiled monkey patch: {exc}')
+                print(f'Could not apply Tiled monkey patch: {exc}')              
 
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
             if os.path.isfile('.ci/drop-in.py'):
