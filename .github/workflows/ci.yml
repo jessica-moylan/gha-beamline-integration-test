@@ -120,7 +120,7 @@ jobs:
             export OPENBLAS_NUM_THREADS=1
             export MKL_NUM_THREADS=1
             
-            cat > /tmp/ci_ipython_startup_runner.py << 'IPYTHON_COMMAND_EOF'
+            command="
             import io, os, glob, sys, traceback, warnings
 
             # Get system arguments, needed currently for SIX with user inputs
@@ -171,27 +171,19 @@ jobs:
 
                     sys.stdin = sys.__stdin__
                     sys.argv = [sys.argv[0]]
-
-                  # Test to see if patch works
-                  elif f.endswith('970-load.py') and beamline_acronym == 'xpd':
-                    with open(f, 'r', encoding='utf-8') as file:
-                        # Read the entire file content into a variable
-                        file_contents = file.read()
-
-                        # Print the contents to the console
-                        print(file_contents)
+                
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
                   print(f'ERROR in {f}:')
                   traceback.print_exc()
                   raise
-            IPYTHON_COMMAND_EOF
+            "
 
             env | grep EPICS || true
 
             set +e
-            ipython --profile=test /tmp/ci_ipython_startup_runner.py
+            ipython --profile=test -c "$command"
             ipython_status=$?
             set -e
 
@@ -199,7 +191,7 @@ jobs:
               echo "Detected segfault (exit 139) in profile startup test, retrying once..."
               sleep 2
               set +e
-              ipython --profile=test /tmp/ci_ipython_startup_runner.py
+              ipython --profile=test -c "$command"
               ipython_status=$?
               set -e
             fi
