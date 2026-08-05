@@ -204,6 +204,7 @@ jobs:
                       )
                       with open(beamline_config_fp, 'w') as f:
                           yaml.dump(beamline_config, f)
+                  print(f'Loaded beamline configuration {beamline_config}')
                   return beamline_config
 
               xpdacq.xpdacq_conf._load_beamline_config = _ci_load_beamline_config
