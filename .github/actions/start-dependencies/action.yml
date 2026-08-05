@@ -8,7 +8,7 @@ runs:
       run: |
         # Runs on the setup-python interpreter so it does not depend on the
         # profile's pixi env (which may not include caproto).
-        python3 -m pip install -U caproto
+        python3 -m pip install -U caproto p4p
 
         # nohup + disown so the IOC survives past this step; record its PID
         # for a later cleanup step. Each workflow step runs in a fresh shell,
@@ -19,6 +19,13 @@ runs:
         disown
 
         echo "BLACKHOLE_IOC_PID=${IOC_PID}" >> $GITHUB_ENV
+
+        nohup python3 $GITHUB_ACTION_PATH/spoof_pva_ioc.py \
+          > /tmp/pva_ioc.log 2>&1 &
+        PVA_IOC_PID=$!
+        disown
+
+        echo "PVA_IOC_PID=${PVA_IOC_PID}" >> $GITHUB_ENV
         caproto_repeater_path="$(command -v caproto-repeater)"
 
         test -n "$caproto_repeater_path"
