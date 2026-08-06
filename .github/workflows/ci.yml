@@ -62,7 +62,7 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        with:
+        with: 
           python-version: 3.11
 
       # Set up pixi; Check https://github.com/NSLS2/nsls2rpms/pulls?q=+is%3Apr+ for current pixi version used on floor
