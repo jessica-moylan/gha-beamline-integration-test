@@ -71,7 +71,7 @@ class BlackholeIOC(PVGroup):
         elif 'Auto' in key:
             return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
         elif 'ImageMode' in key:
-            return ChannelEnum(value=0, enum_strings=['Single', 'Multiple', 'Continuous'])
+            return ChannelEnum(value=1, enum_strings=['Single', 'Multiple', 'Continuous'])
         elif 'WriteMode' in key:
             return ChannelEnum(value=0, enum_strings=['Single', 'Capture', 'Stream'])
         elif 'ArraySize' in key:
