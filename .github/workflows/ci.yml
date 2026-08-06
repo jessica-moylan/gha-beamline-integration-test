@@ -34,6 +34,7 @@ jobs:
           - opls
           - tes
           - xfp
+          - xpd
         include:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: chx, redis-host: xf11id1-chx-redis1.nsls2.bnl.gov, repo: jessica-moylan/chx-profile-collection, branch: LICENSE }
@@ -51,6 +52,7 @@ jobs:
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
           - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
+          - { endstation: xpd, redis-host: xf28id1-xpd-redis1.nsls2.bnl.gov, repo: xpd-profile-collection, branch: main }  #need to find correct redis-host
     runs-on: ubuntu-latest
     steps:
       - name: Checkout test harness
@@ -95,6 +97,24 @@ jobs:
           eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
           echo "DEBUG: TILED_API_KEY_LEN=${#TILED_API_KEY}"
           cd "${CLONED_REPO}"
+
+          python3 << 'PATCH_STARTUP_EOF'
+          import glob
+          import re
+          from pathlib import Path
+
+          pattern = re.compile(
+              r"_load_beamline_config\(\s*glbl\[\s*(['\"])blconfig_path\1\s*\]\s*\)"
+          )
+          replacement = "_load_beamline_config(glbl['blconfig_path'], test=True)"
+
+          for startup_file in sorted(glob.glob('startup/*.py')):
+              path = Path(startup_file)
+              text = path.read_text()
+              patched = pattern.sub(replacement, text)
+              if patched != text:
+                path.write_text(patched)
+          PATCH_STARTUP_EOF
 
           if [ "${{ matrix.pixi-env }}" = "terminal" ]; then
             /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
@@ -145,7 +165,51 @@ jobs:
                 Context.whoami = _ci_fixed_whoami
                 print('Applied CI monkey patch for tiled Context.whoami')
             except Exception as exc:
-                print(f'Could not apply Tiled monkey patch: {exc}')
+                print(f'Could not apply Tiled monkey patch: {exc}')      
+                
+            # Monkey Patch the xpdAcq _load_beamline_config since 1.0.0 does not have the pass for CI
+            try:
+              import platform
+              import subprocess
+              import yaml
+              import os
+              import xpdacq
+              from xpdacq.xpdacq_conf import _load_beamline_config
+
+              def _ci_load_beamline_config(beamline_config_fp, verif='', test=False):
+                  if (not test) and (not os.path.isfile(beamline_config_fp)):
+                      raise xpdacq.tools.xpdAcqException(
+                          'WARNING: can not find long term beamline '
+                          'configuration file. Please contact the '
+                          'beamline scientist ASAP'
+                      )
+                  os_type = platform.system()
+                  if os_type == 'Windows':
+                      editor = 'notepad'
+                  else:
+                      editor = os.environ.get('EDITOR', 'vim')
+                  beamline_config = dict()
+                  if not test:
+                      while verif.upper() not in ('Y', 'YES'):
+                          with open(beamline_config_fp, 'r') as f:
+                              beamline_config = yaml.unsafe_load(f)
+                          verif = input('\nIs this configuration correct? y/n: ')
+                          if verif.upper() in ('N', 'NO'):
+                              print('Edit, save, and close the configuration file.\n')
+                              subprocess.call([editor, beamline_config_fp])
+                      beamline_config['Verified by'] = input('Please input your initials: ')
+                      timestamp = datetime.datetime.now()
+                      beamline_config['Verification time'] = timestamp.strftime(
+                          '%Y-%m-%d %H:%M:%S'
+                      )
+                      with open(beamline_config_fp, 'w') as f:
+                          yaml.dump(beamline_config, f)
+                  return beamline_config
+
+              xpdacq.xpdacq_conf._load_beamline_config = _ci_load_beamline_config
+              print('Applied CI monkey patch for xpdacq.xpdacq_conf._load_beamline_config')
+            except Exception as exc:
+                print(f'Could not apply xpdacq.xpdacq_conf monkey patch: {exc}')
 
             startup_files = sorted(glob.glob(os.path.join(os.getcwd(), 'startup/*.py')))
             print(f'Found startup files: {os.getcwd()}/startup/*.py -> {startup_files}')
