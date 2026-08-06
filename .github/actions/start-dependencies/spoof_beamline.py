@@ -54,49 +54,47 @@ class BlackholeIOC(PVGroup):
 
     def fabricate_channel(self, key):
         # Use existing channels if they exist
-        # if key in self.old_pvdb:
-        #     return self.old_pvdb[key]
-        # if 'PluginType' in key:
-        #     for pattern, val in PLUGIN_TYPE_PVS:
-        #         if pattern.search(key):
-        #             return ChannelString(value=val)
-        # elif 'ArrayPort' in key:
-        #     return ChannelString(value=key)
-        # elif 'PortName' in key:
-        #     return ChannelString(value=key)
-        # elif 'EnableCallbacks' in key:
-        #     return ChannelEnum(value=0, enum_strings=['Disabled', 'Enabled'])
-        # elif 'BlockingCallbacks' in key:
-        #     return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
-        # elif 'Auto' in key:
-        #     return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
-        # elif 'ImageMode' in key:
-        #     return ChannelEnum(value=0, enum_strings=['Single', 'Multiple', 'Continuous'])
-        # elif 'WriteMode' in key:
-        #     return ChannelEnum(value=0, enum_strings=['Single', 'Capture', 'Stream'])
-        # elif 'ArraySize' in key:
-        #     return ChannelData(value=10)
-        # elif 'TriggerMode' in key:
-        #     return ChannelEnum(value=0, enum_strings=['Internal', 'External'])
-        # elif 'FileWriteMode' in key:
-        #     return ChannelEnum(value=0, enum_strings=['Single'])
-        # elif 'FilePathExists' in key:
-        #     return ChannelData(value=1)
-        # elif 'WaitForPlugins' in key:
-        #     return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
-        # elif ('file' in key.lower() and 'number' not in key.lower() and
-        #     'mode' not in key.lower()):
-        #     return ChannelChar(value='a' * 250)
-        # elif ('filenumber' in key.lower()):
-        #     return ChannelInteger(value=0)
-        # elif 'Compression' in key:
-        #     return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
-        # elif key.endswith(".EGU"):
-        #     return ChannelString(value="mm")
-        # elif key.endswith(":Acquire"):
-        #     return ChannelEnum(value=0, enum_strings=['Start', 'Stop'])
-        # print("Fabricating channel for key:", key)
-        return ChannelDouble(value=1.0)
+        if key in self.old_pvdb:
+            return self.old_pvdb[key]
+        if 'PluginType' in key:
+            for pattern, val in PLUGIN_TYPE_PVS:
+                if pattern.search(key):
+                    return ChannelString(value=val)
+        elif 'ArrayPort' in key:
+            return ChannelString(value=key)
+        elif 'PortName' in key:
+            return ChannelString(value=key)
+        elif 'EnableCallbacks' in key:
+            return ChannelEnum(value=0, enum_strings=['Disabled', 'Enabled'])
+        elif 'BlockingCallbacks' in key:
+            return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
+        elif 'Auto' in key:
+            return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
+        elif 'ImageMode' in key:
+            return ChannelEnum(value=0, enum_strings=['Single', 'Multiple', 'Continuous'])
+        elif 'WriteMode' in key:
+            return ChannelEnum(value=0, enum_strings=['Single', 'Capture', 'Stream'])
+        elif 'ArraySize' in key:
+            return ChannelData(value=10)
+        elif 'TriggerMode' in key:
+            return ChannelEnum(value=0, enum_strings=['Internal', 'External'])
+        elif 'FileWriteMode' in key:
+            return ChannelEnum(value=0, enum_strings=['Single'])
+        elif 'FilePathExists' in key:
+            return ChannelData(value=1)
+        elif 'WaitForPlugins' in key:
+            return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
+        elif ('file' in key.lower() and 'number' not in key.lower() and
+            'mode' not in key.lower()):
+            return ChannelChar(value='a' * 250)
+        elif ('filenumber' in key.lower()):
+            return ChannelInteger(value=0)
+        elif 'Compression' in key:
+            return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
+        elif key.endswith(".EGU"):
+            return ChannelString(value="mm")
+        print("Fabricating channel for key:", key)
+        return ChannelDouble(value=0.0)
 
 
 def main():
