@@ -1,0 +1,4 @@
+nsls2:
+  uri: https://tiled.nsls2.bnl.gov
+  headers:
+    Authorization: "Apikey secret"
