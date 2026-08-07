@@ -8,7 +8,7 @@ runs:
       run: |
         # Runs on the setup-python interpreter so it does not depend on the
         # profile's pixi env (which may not include caproto).
-        python3 -m pip install -U caproto
+        python3 -m pip install -U caproto p4p
 
         # nohup + disown so the IOC survives past this step; record its PID
         # for a later cleanup step. Each workflow step runs in a fresh shell,
@@ -19,6 +19,13 @@ runs:
         disown
 
         echo "BLACKHOLE_IOC_PID=${IOC_PID}" >> $GITHUB_ENV
+
+        nohup python3 $GITHUB_ACTION_PATH/spoof_pva_ioc.py \
+          > /tmp/pva_ioc.log 2>&1 &
+        PVA_IOC_PID=$!
+        disown
+
+        echo "PVA_IOC_PID=${PVA_IOC_PID}" >> $GITHUB_ENV
         caproto_repeater_path="$(command -v caproto-repeater)"
 
         test -n "$caproto_repeater_path"
@@ -42,18 +49,27 @@ runs:
 
         tiled_profiles_dir="$HOME/.config/tiled/profiles/"
         mkdir -v -p "${tiled_profiles_dir}"
-        cat << EOF > ${tiled_profiles_dir}/profiles.yml
+
+        if grep -qw "${BEAMLINE_ACRONYM}" $GITHUB_WORKSPACE/configs/post_data_security.txt; then
+          echo "Beamline ${BEAMLINE_ACRONYM} is in the post_data_security.txt file, creating a direct profile for Tiled"
+          cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
         ${ENDSTATION_ACRONYM}:
           direct:
             authentication:
               allow_anonymous_access: true
             trees:
-            - tree: databroker.mongo_normalized:Tree.from_uri
-              path: /
-              args:
-                uri: mongodb://localhost:27017/metadatastore-local
-                asset_registry_uri: mongodb://localhost:27017/asset-registry-local
+              - tree: databroker.mongo_normalized:Tree.from_uri
+                path: /
+                args:
+                  uri: mongodb://localhost:27017/metadatastore-local
+                  asset_registry_uri: mongodb://localhost:27017/asset-registry-local
         EOF
+        else
+          cat > "${tiled_profiles_dir}/profiles.yml" <<EOF
+        ${ENDSTATION_ACRONYM}:
+          uri: https://tiled.nsls2.bnl.gov/api/v1/metadata/${ENDSTATION_ACRONYM}/raw
+        EOF
+        fi
 
         sudo mkdir -v -p /etc/bluesky/
         cat << EOF | sudo tee /etc/bluesky/kafka.yml
