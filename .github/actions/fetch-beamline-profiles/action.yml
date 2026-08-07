@@ -28,12 +28,17 @@ runs:
         pixi --version
         pixi install --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }}
         echo "::endgroup::"
-        
+
+# TODO:
+  # pretty sure this is no longer used since many of the profile-collections have these files that are years out of date 
+  # Something needs to be added either to the profile-collections (updating them since many are out of date ~5 years for some 
+  # or somewhere here with if statements to run important steps in the bl-specific.sh files that are needed for startup to run
     - name: Run beamline-specific steps
       shell: bash -leo pipefail {0}
       run: |
         echo "::group::Run beamline-specific steps"
-        if [ -f "${CLONED_REPO}/.ci/bl-specific.sh" ]; then
+
+        if [ -f "${CLONED_REPO}/.ci/bl-specific.sh" ] && ([ "${{ matrix.endstation }}" != "smi" ] && [ "${{ matrix.endstation }}" != "srx" ] && [ "${{ matrix.endstation }}" != "nyx" ] && [ "${{ matrix.endstation }}" != "six" ] && [ "${{ matrix.endstation }}" != "opls" ] && [ "${{ matrix.endstation }}" != "lix" ]  && [ "${{ matrix.endstation }}" != "xpd" ]); then
             # Activate the profile's pixi env so the script inherits its PATH/env.
             eval "$(pixi shell-hook --manifest-path ${CLONED_REPO}/pixi.toml -e ${{ matrix.pixi-env }})"
             # Non-interactive CI shells need the conda hook for `conda activate`.
