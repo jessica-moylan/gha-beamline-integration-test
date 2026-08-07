@@ -34,6 +34,7 @@ jobs:
           - tes
           - xfp
           - xpd
+          - xpdd
         include:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
@@ -51,6 +52,7 @@ jobs:
           - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
           - { endstation: xpd, redis-host: xf28id1-xpd-redis1.nsls2.bnl.gov, repo: xpd-profile-collection, branch: main }  #need to find correct redis-host
+          - { endstation: xpdd, redis-host: xf28id2-xpdd-redis1.nsls2.bnl.gov, repo: xpdd-profile-collection, branch: main } 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout test harness
