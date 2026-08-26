@@ -49,6 +49,7 @@ runs:
 
         tiled_profiles_dir="$HOME/.config/tiled/profiles/"
         mkdir -v -p "${tiled_profiles_dir}"
+        
         ENDSTATION_ACRONYM="${BEAMLINE_ACRONYM}"
   
         if [[ "${BEAMLINE_ACRONYM}" == "xfm-maia" ]]; then
