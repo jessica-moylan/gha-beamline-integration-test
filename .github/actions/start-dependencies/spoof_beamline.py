@@ -95,7 +95,7 @@ class BlackholeIOC(PVGroup):
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
         elif "acquire" in key.lower():
-            return ChannelEnum(value=1.0, enum_strings=['No', 'Yes'])
+            return ChannelEnum(value=0, enum_strings=['No', 'Yes'])
         return ChannelDouble(value=0.0)
 
 
