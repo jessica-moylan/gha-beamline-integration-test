@@ -54,6 +54,7 @@ class BlackholeIOC(PVGroup):
 
     def fabricate_channel(self, key):
         # Use existing channels if they exist
+        print("Fabricating channel for key:", key)
         if key in self.old_pvdb:
             return self.old_pvdb[key]
         if 'PluginType' in key:
@@ -93,7 +94,8 @@ class BlackholeIOC(PVGroup):
             return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
-        print("Fabricating channel for key:", key)
+        elif "acquire" in key.lower():
+            return ChannelDouble(value=1.0, enum_strings=['No', 'Yes'])
         return ChannelDouble(value=0.0)
 
 
