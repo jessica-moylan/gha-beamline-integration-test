@@ -166,6 +166,33 @@ jobs:
                 print('Applied CI monkey patch for tiled Context.whoami')
             except Exception as exc:
                 print(f'Could not apply Tiled monkey patch: {exc}')      
+
+            # Compatibility patch for recordwhat with newer ophyd versions
+            # where EpicsSignalRO.metadata has no setter.
+            try:
+              from ophyd.signal import EpicsSignalRO
+
+              metadata_prop = getattr(EpicsSignalRO, 'metadata', None)
+              if isinstance(metadata_prop, property) and metadata_prop.fset is None:
+                def _ci_set_metadata(self, value):
+                  if value is None:
+                    return
+                  if not hasattr(self, '_metadata') or self._metadata is None:
+                    self._metadata = {}
+                  if isinstance(value, dict):
+                    self._metadata.update(value)
+
+                EpicsSignalRO.metadata = property(
+                  metadata_prop.fget,
+                  _ci_set_metadata,
+                  metadata_prop.fdel,
+                  metadata_prop.__doc__,
+                )
+                print('Applied CI monkey patch for ophyd EpicsSignalRO.metadata setter')
+              else:
+                print('No ophyd metadata setter patch needed')
+            except Exception as exc:
+              print(f'Could not apply ophyd metadata setter monkey patch: {exc}')
                 
             # Monkey Patch the xpdAcq _load_beamline_config since 1.0.0 does not have the pass for CI
             try:
