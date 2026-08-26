@@ -50,7 +50,7 @@ jobs:
           - { endstation: srx, redis-host: xf28id1-srx-redis1.nsls2.bnl.gov, repo: srx-profile-collection, branch: main } #need to find correct redis-host
           - { endstation: nyx, redis-host: xf19id2-nyx-redis1.nsls2.bnl.gov, repo: nyx-profile-collection, branch: main }
           - { endstation: tes, redis-host: xf28id1-tes-redis1.nsls2.bnl.gov, repo: tes-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
-          - { endstation: xfm-maia, redis-host: xf28id1-xfm-maia-redis1.nsls2.bnl.gov, repo: xfm-maia-profile-collection, branch: pixi_2026C2 }  #need to find correct redis-host
+          - { endstation: xfm-maia, redis-host: xf28id1-xfm-maia-redis1.nsls2.bnl.gov, repo: jessica-moylan/xfm-maia-profile-collection, branch: LICENSE }  #need to find correct redis-host
           - { endstation: xfp, redis-host: xf28id1-xfp-redis1.nsls2.bnl.gov, repo: xfp-profile-collection, branch: master }  #need to find correct redis-host
           - { endstation: xpd, redis-host: xf28id1-xpd-redis1.nsls2.bnl.gov, repo: xpd-profile-collection, branch: main }  #need to find correct redis-host
     runs-on: ubuntu-latest
