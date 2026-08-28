@@ -93,9 +93,9 @@ class BlackholeIOC(PVGroup):
             return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
-        elif "acquire" in key.lower():
+        elif ":Acquire" in key.lower():
             print("Fabricating channel for key:", key)
-            return ChannelEnum(value=1, enum_strings=['Acquire', 'Done'])
+            return ChannelEnum(value=0, enum_strings=['Acquire', 'Done'])
         return ChannelDouble(value=0.0)
 
 
