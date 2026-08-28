@@ -19,6 +19,7 @@ jobs:
         pixi-env: [terminal] # TODO: re-enable [terminal, qs] when ready to test queueserver
         endstation:
           - csx
+          - esm-arpes
           - fmx
           - fxi
           - hex
@@ -36,6 +37,7 @@ jobs:
           - xpd
         include:
           - { endstation: csx, redis-host: xf23id1-csx-redis1.nsls2.bnl.gov, repo: csx-profile-collection, branch: main }
+          - { endstation: esm-arpes, redis-host: xf23id1-esm-arpes-redis1.nsls2.bnl.gov, repo: esm-arpes-profile-collection, branch: main }
           - { endstation: fxi, redis-host: xf17id1-fxi-redis1.nsls2.bnl.gov, repo: fxi-profile-collection, branch: main }
           - { endstation: fmx, redis-host: xf17id2-fmx-redis1.nsls2.bnl.gov, repo: fmx-profile-collection, branch: pixi_2026C2 } #need to find correct redis-host
           - { endstation: hex, redis-host: xf27id1-hex-redis1.nsls2.bnl.gov, repo: hex-profile-collection, branch: main } 
