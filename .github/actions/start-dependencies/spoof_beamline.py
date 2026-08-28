@@ -20,8 +20,18 @@ PLUGIN_TYPE_PVS = [
     (re.compile('Nexus\\d:'), 'NDPluginNexus'),
     (re.compile('HDF\\d:'), 'NDFileHDF5'),
     (re.compile('Magick\\d:'), 'NDFileMagick'),
+    (re.compile('TIFF\\d:'), 'NDFileTIFF'),
+    (re.compile('HDF\\d:'), 'NDFileHDF5'),
     (re.compile('Current\\d:'), 'NDPluginStats'),
     (re.compile('SumAll'), 'NDPluginStats'),
+]
+
+# Mapping table for PVs that need specific enum/boolean types instead of float
+# Format: (regex_pattern, enum_strings or None for boolean)
+ATTENUATOR_TYPE_PVS = [
+    (re.compile(r':DO\d+-Sts$'), ['Out', 'In']),
+    (re.compile(r':DI\d+-Sts$'), ['Out', 'In']),
+    (re.compile(r':DIO\d+-Mode$'), ['False', 'True']),
 ]
 
 
@@ -56,6 +66,12 @@ class BlackholeIOC(PVGroup):
         # Use existing channels if they exist
         if key in self.old_pvdb:
             return self.old_pvdb[key]
+        
+        # Check attenuator PVs early - they need specific types
+        for pattern, enum_strings in ATTENUATOR_TYPE_PVS:
+            if pattern.search(key):
+                return ChannelEnum(value=0, enum_strings=enum_strings)
+        
         if 'PluginType' in key:
             for pattern, val in PLUGIN_TYPE_PVS:
                 if pattern.search(key):
@@ -93,8 +109,7 @@ class BlackholeIOC(PVGroup):
             return ChannelEnum(value=0, enum_strings=['None', 'N-bit', 'szip', 'zlib', 'blosc'])
         elif key.endswith(".EGU"):
             return ChannelString(value="mm")
-        return ChannelDouble(value=0)
-
+        return ChannelDouble(value=0.0)
 
 def main():
     print('''
