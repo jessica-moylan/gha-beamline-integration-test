@@ -41,7 +41,7 @@ class ReallyDefaultDict(defaultdict):
 
     def __missing__(self, key):
         if (key.endswith('-SP') or key.endswith('-I') or
-                key.endswith('-RB') or key.endswith('-Cmd')):
+                key.endswith('-RB') or key.endswith('-Cmd') or key.endswith('-Sts')):
             key, *_ = key.rpartition('-')
             return self[key]
         if key.endswith('_RBV') or key.endswith(':RBV'):
