@@ -23,3 +23,12 @@ runs:
             kill -SIGINT "${PVA_IOC_PID}" 2>/dev/null || true
         fi
       shell: bash
+
+    - name: Stop compose services
+      if: always()
+      shell: bash
+      run: |
+        if [ "${SERVICES_BACKEND:-}" = "compose" ] && [ -f "$GITHUB_WORKSPACE/services/docker-compose.yml" ]; then
+          docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" logs --no-color --tail=200 > /tmp/compose_services.log 2>&1 || true
+          docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" down -v || true
+        fi
