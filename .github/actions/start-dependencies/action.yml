@@ -38,6 +38,8 @@ runs:
         # perhaps this path should be a input to the action so we do not need to have this entire code in the ci 
         cp -v "$GITHUB_WORKSPACE/configs/pyOlog.conf" "$HOME/.pyOlog.conf"
 
+        echo $HOME
+
         databroker_conf_dir="$HOME/.config/databroker"
         mkdir -v -p ${databroker_conf_dir}
 
