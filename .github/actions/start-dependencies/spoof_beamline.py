@@ -30,7 +30,7 @@ PLUGIN_TYPE_PVS = [
 # Format: (regex_pattern, enum_strings or None for boolean)
 ATTENUATOR_TYPE_PVS = [
     (re.compile(r':DO\d+-Sts$'), ['Out', 'In']),
-    (re.compile(r':DI\d+-Sts$'), ['Out', 'In']),
+    (re.compile(r':DI\d+-Sts$'), ['Low', 'High']),
     (re.compile(r':DIO\d+-Mode$'), ['False', 'True']),
 ]
 
