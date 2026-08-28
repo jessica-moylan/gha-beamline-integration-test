@@ -1,0 +1,34 @@
+name: 'Stop services'
+description: 'Stops the blackhole IOC, PVA IOC, and stunnel services'
+runs:
+  using: 'composite'
+  steps:
+    - name: Stop Stunnel
+      if: always()
+      shell: bash --login -eo pipefail {0}
+      run: |
+        sudo service stunnel4 stop 2>/dev/null || true
+        sudo pkill -f stunnel 2>/dev/null || true
+        
+    - name: Kill Blackhole IOC
+      run: |
+        if [ -n "${BLACKHOLE_IOC_PID:-}" ]; then
+            kill -SIGINT "${BLACKHOLE_IOC_PID}" 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Kill PVA IOC
+      run: |
+        if [ -n "${PVA_IOC_PID:-}" ]; then
+            kill -SIGINT "${PVA_IOC_PID}" 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Stop compose services
+      if: always()
+      shell: bash
+      run: |
+        if [ "${SERVICES_BACKEND:-}" = "compose" ] && [ -f "$GITHUB_WORKSPACE/services/docker-compose.yml" ]; then
+          docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" logs --no-color --tail=200 > /tmp/compose_services.log 2>&1 || true
+          docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" down -v || true
+        fi
