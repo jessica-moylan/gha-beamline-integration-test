@@ -1,8 +1,21 @@
 name: 'Start dependencies'
 description: "Starts the necessary dependencies for testing beamline profiles including blackhole IOC, Tiled, pyOlog, databroker, and Kafka"
+inputs:
+  services-backend:
+    description: >-
+      How Redis, MongoDB, Kafka and Tiled are provided. `compose` (default) starts all four from
+      services/docker-compose.yml — the same file a developer can run locally to reproduce a job.
+      `actions` keeps the previous per-service mechanisms (marketplace Redis/Mongo actions, docker run
+      Kafka, stunnel TLS, Tiled from the profile's pixi env) as a rollback.
+    required: false
+    default: 'compose'
 runs:
   using: 'composite'
   steps:
+    - name: Record services backend
+      shell: bash
+      run: echo "SERVICES_BACKEND=${{ inputs.services-backend }}" >> $GITHUB_ENV
+
     - name: Endstation env vars
       shell: bash -leo pipefail {0}
       run: |
@@ -81,17 +94,37 @@ runs:
             security.protocol: PLAINTEXT
         EOF
 
-    - name: Start Redis
+    - name: Start services (compose backend)
+      if: inputs.services-backend == 'compose'
+      shell: bash -leo pipefail {0}
+      run: |
+        # One compose file for Redis (6379 plaintext + 6380 TLS), MongoDB, Kafka and Tiled.
+        # Runnable locally the same way:  services/certs.sh <redis-host> && docker compose -f services/docker-compose.yml up -d --wait
+        echo "::group::docker compose up (Redis, MongoDB, Kafka, Tiled)"
+        certdir="$("$GITHUB_WORKSPACE/services/certs.sh" "${REDIS_HOST}")"
+        # Same cert paths the later steps (SSL_CERT_FILE bundle, redis-cli --tls) already expect.
+        cp -v "${certdir}/redis.crt" /tmp/redis.crt
+        cp -v "${certdir}/redis.key" /tmp/redis.key
+        TILED_SERVER_API_KEY_VAR="TILED_BLUESKY_WRITING_API_KEY_${BEAMLINE_ACRONYM^^}"
+        export TILED_SERVER_API_KEY="${!TILED_SERVER_API_KEY_VAR:-secret}"
+        docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" up -d --wait
+        docker compose -f "$GITHUB_WORKSPACE/services/docker-compose.yml" ps
+        echo "::endgroup::"
+
+    - name: Start Redis (actions backend)
+      if: inputs.services-backend == 'actions'
       uses: supercharge/redis-github-action@ea9b21c6ecece47bd99595c532e481390ea0f044 # 1.8.0
       with:
         redis-version: '6'
 
-    - name: Start MongoDB
+    - name: Start MongoDB (actions backend)
+      if: inputs.services-backend == 'actions'
       uses: supercharge/mongodb-github-action@5a87bd81f88e2a8b195f8b7b656f5cda1350815a # 1.11.0
       with:
         mongodb-version: '4.4'
 
-    - name: Start Kafka
+    - name: Start Kafka (actions backend)
+      if: inputs.services-backend == 'actions'
       shell: bash -leo pipefail {0}
       run: |
         # Single-node KRaft broker on localhost:9092 to satisfy the Kafka config
@@ -142,6 +175,14 @@ runs:
         sudo apt-get install -y -qq redis-tools stunnel4
         redis-cli -h ${REDIS_HOST} set "cycle" "\"2025-2\""
         redis-cli -h ${REDIS_HOST} set "data_session" "\"pass-000000\""
+
+        if [ "${SERVICES_BACKEND}" = "compose" ]; then
+          # Redis already serves TLS natively on 6380 (compose backend); only the secret file is needed.
+          sudo mkdir -p /etc/bluesky
+          echo "" | sudo tee /etc/bluesky/redis.secret
+          sudo chmod 644 /etc/bluesky/redis.secret
+          exit 0
+        fi
 
         # Create Redis secret file for profiles that require it with redis_ssl=True.
         # Our local Redis has no auth, but nslsii.configure_base() still tries to read

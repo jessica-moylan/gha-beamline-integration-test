@@ -68,15 +68,21 @@ runs:
         export SSL_CERT_FILE=/tmp/certs.pem
         export REQUESTS_CA_BUNDLE=/tmp/certs.pem
 
-        # Start tiled on a high port (8000) without TLS.
-        TILED_BIN="$(command -v tiled)"
-        nohup "$TILED_BIN" serve catalog --temp \
-          --host 127.0.0.1 \
-          --port 8000 \
-          --api-key "${TILED_SERVER_API_KEY}" > /tmp/tiled.log 2>&1 &
-        TILED_PID=$!
-        disown
-        echo "TILED_PID=${TILED_PID}" >> $GITHUB_ENV
+        if [ "${SERVICES_BACKEND:-compose}" = "actions" ]; then
+          # Start tiled on a high port (8000) without TLS.
+          TILED_BIN="$(command -v tiled)"
+          nohup "$TILED_BIN" serve catalog --temp \
+            --host 127.0.0.1 \
+            --port 8000 \
+            --api-key "${TILED_SERVER_API_KEY}" > /tmp/tiled.log 2>&1 &
+          TILED_PID=$!
+          disown
+          echo "TILED_PID=${TILED_PID}" >> $GITHUB_ENV
+        else
+          # compose backend: the tiled container is already listening on 127.0.0.1:8000;
+          # keep the log path the Show-logs step expects.
+          docker logs beamline-ci-tiled > /tmp/tiled.log 2>&1 || true
+        fi
 
         # Use Caddy as a reverse proxy on 443 with self-signed cert.
         sudo apt-get install -y -qq caddy

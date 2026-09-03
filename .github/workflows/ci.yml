@@ -90,6 +90,10 @@ jobs:
 
       - name: Start dependencies
         uses: ./.github/actions/start-dependencies
+        with:
+          # `compose` (default) or `actions` (previous per-service mechanisms); override per
+          # beamline with `services-backend: actions` in the matrix include to roll one back.
+          services-backend: ${{ matrix.services-backend || 'compose' }}
 
       - name: Run profile startup tests
         shell: bash -leo pipefail {0}
@@ -138,7 +142,7 @@ jobs:
             fi
             
             command="
-            import io, os, glob, sys, traceback, warnings
+            import io, os, glob, sys, time, traceback, warnings
 
             # Get system arguments, needed currently for SIX with user inputs
             # TODO: do both SIX endatations, six and keithley, need to be tested?
@@ -222,6 +226,7 @@ jobs:
                 if not os.path.isfile(f):
                   raise FileNotFoundError(f'File {f} cannot be found.')
                 print(f'Executing {f} in CI')
+                _t0 = time.monotonic()
                 try:
                   if f.endswith('00-startup.py') and beamline_acronym == 'six':
                     sys.argv = ['00-startup.py', 'arg1']
@@ -250,6 +255,7 @@ jobs:
                     ip.parent._exec_file(f)
                   else:
                     ip.parent._exec_file(f)
+                  print(f'STARTUP_FILE_OK {f} {time.monotonic() - _t0:.1f}')
                 except Exception as e:
                   print(f'ERROR in {f}:')
                   traceback.print_exc()
@@ -258,19 +264,24 @@ jobs:
 
             env | grep EPICS || true
 
+            # Tee the startup output so the classify step can explain a failure
+            # (which file, the chained/real exception, harness vs profile).
+            STARTUP_LOG=/tmp/profile_startup.log
+            echo "STARTUP_LOG=${STARTUP_LOG}" >> $GITHUB_ENV
             set +e
-            ipython --profile=test -c "$command"
-            ipython_status=$?
+            ipython --profile=test -c "$command" 2>&1 | tee "${STARTUP_LOG}"
+            ipython_status=${PIPESTATUS[0]}
             set -e
 
             if [ "${ipython_status}" -eq 139 ]; then
               echo "Detected segfault (exit 139) in profile startup test, retrying once..."
               sleep 2
               set +e
-              ipython --profile=test -c "$command"
-              ipython_status=$?
+              ipython --profile=test -c "$command" 2>&1 | tee "${STARTUP_LOG}"
+              ipython_status=${PIPESTATUS[0]}
               set -e
             fi
+            echo "IPYTHON_STATUS=${ipython_status}" >> $GITHUB_ENV
 
             if [ "${ipython_status}" -ne 0 ]; then
               echo "ipython profile startup test failed with exit code ${ipython_status}"
@@ -297,6 +308,23 @@ jobs:
             exit 0
           fi
 
+      # Explain the result: per-startup-file table, the real (chained) exception,
+      # and a verdict — profile / tools package / environment / harness — in the
+      # job summary and as an ::error annotation. Never fails the job itself.
+      - name: Classify startup result
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "${STARTUP_LOG:-/tmp/profile_startup.log}" ]; then
+            python3 "$GITHUB_WORKSPACE/scripts/classify_startup.py" "${STARTUP_LOG:-/tmp/profile_startup.log}" \
+              --tla "${BEAMLINE_ACRONYM}" \
+              --startup-dir "${CLONED_REPO}/startup" \
+              --exit-code "${IPYTHON_STATUS:-0}" \
+              --json /tmp/startup_classification.json
+          else
+            echo "No startup log produced (the run never reached the profile step)." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
     # Show logs
       - name: Show logs
         if: always()
@@ -318,7 +346,8 @@ jobs:
           show_log "Bluesky" "${LOGS_HOME}/.cache/bluesky/log/bluesky.log"
           show_log "Bluesky IPython" "${LOGS_HOME}/.cache/bluesky/log/bluesky_ipython.log"
           echo "=== Kafka ==="
-          docker logs kafka 2>&1 || echo "(not produced)"
+          docker logs kafka 2>&1 || docker logs beamline-ci-kafka 2>&1 || echo "(not produced)"
+          show_log "Compose services (redis/mongo/kafka/tiled)" /tmp/compose_services.log
 
 
     # Stop Services
