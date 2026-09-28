@@ -159,6 +159,22 @@ jobs:
                   elif f.endswith('01-prompt.py') and beamline_acronym == 'opls':
                     RE.md['proposal_number'] = '123456'
                     RE.md['main_proposer'] = 'test_user'
+
+                  elif beamline_acronym == 'cms' and f.endswith('00-startup.py'):
+                    with open(f, 'r') as file:
+                        content = file.read()
+
+                    content = content.replace(
+                        "    os.environ.pop('TILED_API_KEY')\n",
+                        "    print(os.environ.get('TILED_API_KEY'))\n",
+                    )
+
+                    with open(f, 'w') as file:
+                        file.write(content)
+
+                    ip.parent._exec_file(f)
+
+                    RE.md['data_session'] = "test_session"
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
