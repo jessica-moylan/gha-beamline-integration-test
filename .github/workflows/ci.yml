@@ -165,8 +165,8 @@ jobs:
                         content = file.read()
 
                     content = content.replace(
-                        "    os.environ.pop('TILED_API_KEY')\n",
-                        "    print(os.environ.get('TILED_API_KEY'))\n",
+                        '    os.environ.pop(\'TILED_API_KEY\')\n',
+                        '    print(os.environ.get(\'TILED_API_KEY\'))\n',
                     )
 
                     with open(f, 'w') as file:
