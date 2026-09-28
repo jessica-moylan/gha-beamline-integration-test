@@ -174,7 +174,7 @@ jobs:
 
                     ip.parent._exec_file(f)
 
-                    RE.md['data_session'] = "test_session"
+                    RE.md['data_session'] = 'test_session'
                   else:
                     ip.parent._exec_file(f)
                 except Exception as e:
