@@ -71,12 +71,21 @@ runs:
         # For IXS beamline
         if [ ${{ matrix.endstation }} == "ixs" ]; then
           mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/legacy
+
+        elif [ ${{ matrix.endstation }} == "lix" ]; then
+          # the 2026-1 directory is hard coded into the profile and will have to be updated when the "current cycle" changes. 
+          mkdir -v -p /nsls2/data/lix/legacy/2026-1
         fi
 
         # CSM
         if [ ${{ matrix.endstation }} == "csm" ]; then
           mkdir -v -p /nsls2/data/${BEAMLINE_ACRONYM}/proposals
           mkdir -v -p "/nsls2/data3/${BEAMLINE_ACRONYM}/shared/config/bluesky/profile_collection/startup"
+        fi
+
+        # XPD
+        if [ ${{ matrix.endstation }} == "xpd" ]; then
+          mkdir -v -p /home/runner/acqsim
         fi
 
         # TODO: fix SRX and HXN hardcoded paths.
@@ -130,4 +139,7 @@ runs:
         {
             echo "EPICS_CA_AUTO_ADDR_LIST=NO"
             echo "EPICS_CA_ADDR_LIST=127.0.0.1"
+            echo "EPICS_PVA_AUTO_ADDR_LIST=NO"
+            echo "EPICS_PVA_ADDR_LIST=127.0.0.1"
+            echo "RUNNING_IN_NSLS2_CI=True"
         } >> $GITHUB_ENV
