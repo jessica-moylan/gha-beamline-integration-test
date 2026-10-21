@@ -196,5 +196,5 @@ runs:
         else:
           get_or_create_container(beamline, 'migration', specs=['CatalogOfBlueskyRuns'])
           get_or_create_container(beamline, 'raw', specs=['CatalogOfBlueskyRuns'])
-          
+        "
       shell: bash
