@@ -139,7 +139,8 @@ runs:
             echo "127.0.0.1 mongo${i}.nsls2.bnl.gov" | sudo tee -a /etc/hosts
         done
 
-        sudo apt-get install -y -qq redis-tools stunnel4
+        sudo apt-get update
+        sudo apt-get install -y -qq --no-install-recommends redis-tools stunnel4
         redis-cli -h ${REDIS_HOST} set "cycle" "\"2025-2\""
         redis-cli -h ${REDIS_HOST} set "data_session" "\"pass-000000\""
 
